@@ -21,6 +21,7 @@ ALMBpawnBase::ALMBpawnBase()
 	// CubeMesh : 변수 이름
 	// () 경로 입력
 	// 로드하는 시간이 오래걸린다. / 변하지 않을거에 적용 
+	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
 	if (CubeMesh.Succeeded())
 	{
@@ -39,6 +40,13 @@ ALMBpawnBase::ALMBpawnBase()
 	{
 		UE_LOG(LogTemp, Error, TEXT("BasicMaterial를 가져오지 못했습니다."));
 	}
-	
+
+	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("PawnMovement"));
+	PawnMovement->MaxSpeed = MaxSpeed; // 최대로 낼 수 있는 이동 속도
+	PawnMovement->Acceleration = 2048.0f; // 얼마나 빠르게 속도가 증가할 지
+	PawnMovement->Deceleration = 2000.0f; // 얼마나 빠르게 감속할 지 
+	PawnMovement->TurningBoost = 8.0f; // 회전을 얼마나 민첩하게할 지
+
+
 }
 

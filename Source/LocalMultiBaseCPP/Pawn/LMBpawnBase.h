@@ -15,6 +15,8 @@ public:
 	// Sets default values for this pawn's properties
 	ALMBpawnBase();
 
+
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UBoxComponent* BoxComponent;
@@ -24,5 +26,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UFloatingPawnMovement* PawnMovement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float MaxSpeed = 500.0f;
 
 };
