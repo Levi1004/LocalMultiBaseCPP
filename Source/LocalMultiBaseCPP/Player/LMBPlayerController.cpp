@@ -67,6 +67,11 @@ void ALMBPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(IA_Move1P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnInputMove1P);
 		EnhancedInputComponent->BindAction(IA_Move1P, ETriggerEvent::Completed, this, &ALMBPlayerController::OnInputMove1P);
 	}
+	if (IA_Move2P) //IA_Move1P != nullptr
+	{
+		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnInputMove2P);
+		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Completed, this, &ALMBPlayerController::OnInputMove2P);
+	}
 	if (IA_Attack1P)
 	{
 		EnhancedInputComponent->BindAction(IA_Attack1P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnAttack1P);

@@ -15,6 +15,10 @@ ULMBAnimInstance::ULMBAnimInstance()
 	{
 		AttackMontage = AMObj.Object;
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AttackMontage를 가져오지 못했습니다."));
+	}
 
 	MovingThreshould = 3.0f;
 }

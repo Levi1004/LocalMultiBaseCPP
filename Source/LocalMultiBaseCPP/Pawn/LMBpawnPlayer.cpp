@@ -16,6 +16,7 @@ void ALMBpawnPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
     ULMBAnimInstance* AnimInstance = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance());
+	LMBAnim = AnimInstance;
 
 	APlayerController* FirstPlayerController = GetWorld()->GetFirstPlayerController();
 	ALMBPlayerController* LMBPlayerController = Cast<ALMBPlayerController>(FirstPlayerController);
