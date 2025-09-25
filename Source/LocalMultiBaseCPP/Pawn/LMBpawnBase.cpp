@@ -4,7 +4,7 @@
 #include "Pawn/LMBpawnBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/BoxComponent.h"
-#include "Components/InstancedStaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 
 // Sets default values
@@ -14,7 +14,7 @@ ALMBpawnBase::ALMBpawnBase()
 	SetRootComponent(BoxComponent);
 	BoxComponent->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
 
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	MeshComponent->SetupAttachment(BoxComponent);
 
 	// FObjectfinder<가져올 오브젝트 타입>
@@ -22,24 +22,21 @@ ALMBpawnBase::ALMBpawnBase()
 	// () 경로 입력
 	// 로드하는 시간이 오래걸린다. / 변하지 않을거에 적용 
 	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
-	if (CubeMesh.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshObj(TEXT("/Game/LMBCPP/Art/Models/sk_CharM_Base.sk_CharM_Base"));
+	if (MeshObj.Succeeded())
 	{
-		MeshComponent->SetStaticMesh(CubeMesh.Object);
+		MeshComponent->SetSkeletalMesh(MeshObj.Object);
+		// pitch : Y
+		// Yaw : Z
+		// Roll : X
+		MeshComponent->AddRelativeLocation(FVector(0.0f, 0.0f, -50.0f));
+		MeshComponent->AddLocalRotation(FRotator(0, -90.0f, 0.0f));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("CubeMesh를 가져오지 못했습니다."));
+		UE_LOG(LogTemp, Error, TEXT("MeshObj를 가져오지 못했습니다."));
 	}
-	static ConstructorHelpers::FObjectFinder<UMaterial> BasicMaterial(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
-	if (BasicMaterial.Succeeded())
-	{
-		MeshComponent->GetStaticMesh()->SetMaterial(0, BasicMaterial.Object);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("BasicMaterial를 가져오지 못했습니다."));
-	}
+	
 
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("PawnMovement"));
 	PawnMovement->MaxSpeed = MaxSpeed; // 최대로 낼 수 있는 이동 속도
