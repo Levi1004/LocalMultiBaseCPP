@@ -10,10 +10,14 @@
 
 ALMBPlayerController::ALMBPlayerController()
 {
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCObj(TEXT(" / Game / LMBCPP / Inputs / IMC_LMBPlayerInput.IMC_LMBPlayerInput"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCObj(TEXT("/Game/LMBCPP/Inputs/IMC_LMBPlayerInput.IMC_LMBPlayerInput"));
 	if (IMCObj.Succeeded())
 	{
 		IMC_LMBPlayerInput = IMCObj.Object;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("할당되지 않았습니다."));
 	}
 	
 	static ConstructorHelpers::FObjectFinder<UInputAction> Move1PObj(TEXT("/Game/LMBCPP/Inputs/IA_Move1P.IA_Move1P"));
@@ -40,6 +44,25 @@ void ALMBPlayerController::BeginPlay()
 	}
 }
 
+void ALMBPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	check(EnhancedInputComponent);
+
+	if (IA_Move1P) //IA_Move1P != nullptr
+	{
+		EnhancedInputComponent->BindAction(IA_Move1P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnInputMove1P);
+		EnhancedInputComponent->BindAction(IA_Move1P, ETriggerEvent::Completed, this, &ALMBPlayerController::OnInputMove1P);
+	}
+	if (IA_Move2P)
+	{
+		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnInputMove2P);
+		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Completed, this, &ALMBPlayerController::OnInputMove2P);
+	}
+}
+
 void ALMBPlayerController::AddPawnPlayer(ALMBpawnPlayer* NewPlayer)
 {
 	check(NewPlayer);
@@ -47,10 +70,20 @@ void ALMBPlayerController::AddPawnPlayer(ALMBpawnPlayer* NewPlayer)
 	if (!PawnPlayers.Contains(NewPlayer))
 	{
 		PawnPlayers.Add(NewPlayer);
-		UE_LOG(LogTemp, Log, TEXT("PawnPalyers에 %d 번 플레이어 추가"),NewPlayer->GetPlayerIndex());
+		UE_LOG(LogTemp, Warning, TEXT("PawnPalyers에 %d 번 플레이어 추가"), NewPlayer->GetPlayerIndex());
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PawnPalyers에 이미 추가 된 플레이어 입니다."));
 	}
+}
+
+void ALMBPlayerController::OnInputMove1P(const FInputActionValue& Value)
+{
+	PawnPlayers[0]->OnInputMove(Value.Get<FVector2D>());
+}
+
+void ALMBPlayerController::OnInputMove2P(const FInputActionValue& Value)
+{
+	PawnPlayers[1]->OnInputMove(Value.Get<FVector2D>());
 }

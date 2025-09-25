@@ -32,6 +32,14 @@ protected:
 	TSubclassOf<class ALMBpawnPlayer> LMBpawnPlayerClass;
 
 private:
-	class APlayerStart* FindPlayerStart(class UWorld* CurrentWorld, const FName& TargetTag);
-	
+	class APlayerStart* FindPlayerStart( UWorld* CurrentWorld, const FName& TargetTag);
+
+	void SpawnLocalPlayer(UWorld* World, class APlayerStart* PlayerStart);
+
+	ULocalPlayer* CreateLocalPlayer();
+
+	class ALMBpawnPlayer* SpawnAndPossessPawn(
+		UWorld* World, 
+		class APlayerStart* PlayerStart, 
+		class APlayerController* PlayerController);
 };

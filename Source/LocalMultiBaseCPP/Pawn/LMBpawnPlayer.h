@@ -18,8 +18,20 @@ public:
 	ALMBpawnPlayer();
 
 protected:
+	// Posses 될 때 나를 빙의 시키는 컨트롤러를 매개변수로 넣어주며 실행되는 함수
+	virtual void PossessedBy(AController* NewController)override;
+
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	FVector LastMoveDirection;
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player")
 	int32 PlayerIndex = -1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float RoatationTnterSpeed = 10.0f;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Player")
@@ -27,4 +39,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	FORCEINLINE void SetPlayerIndex(int32 NewIndex) { PlayerIndex = NewIndex; }
+
+public:
+	void OnInputMove(const FVector2D& MoveVector);
+	void RotateTowardMovement(const FVector& MoveDir, float DeltaTime);
 };

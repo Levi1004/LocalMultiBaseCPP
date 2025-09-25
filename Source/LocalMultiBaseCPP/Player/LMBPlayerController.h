@@ -21,6 +21,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void SetupInputComponent() override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Player")
 	TArray<class ALMBpawnPlayer*> PawnPlayers;
@@ -37,4 +39,8 @@ protected:
 	public:
 		UFUNCTION(BlueprintCallable, Category = "Player")
 		void AddPawnPlayer(class ALMBpawnPlayer* NewPlayer);
+
+private:
+	void OnInputMove1P(const struct FInputActionValue& Value);
+	void OnInputMove2P(const struct FInputActionValue& Value);
 };
