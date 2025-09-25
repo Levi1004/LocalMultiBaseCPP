@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Animation/LMBAnimInstance.h"
 
 // Sets default values
 ALMBpawnBase::ALMBpawnBase()
@@ -22,7 +23,7 @@ ALMBpawnBase::ALMBpawnBase()
 	// () 경로 입력
 	// 로드하는 시간이 오래걸린다. / 변하지 않을거에 적용 
 	
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshObj(TEXT("/Game/LMBCPP/Art/Models/sk_CharM_Base.sk_CharM_Base"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshObj(TEXT("/Game/LMBCPP/Art/Models/SK_CharM_Cardboard.SK_CharM_Cardboard"));
 	if (MeshObj.Succeeded())
 	{
 		MeshComponent->SetSkeletalMesh(MeshObj.Object);
@@ -36,7 +37,16 @@ ALMBpawnBase::ALMBpawnBase()
 	{
 		UE_LOG(LogTemp, Error, TEXT("MeshObj를 가져오지 못했습니다."));
 	}
-	
+
+	//FClassFinder : 경로에있는 클래스를 가져온다.
+	// 클래스를 경로로 가져올땐 경로 뒤에 _C를 붙여줘야 한다.
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimClassRef(TEXT("/Game/LMBCPP/Animation/AB_LMBAnimainstans.AB_LMBAnimainstans_C"));
+	if (AnimClassRef.Succeeded())
+	{
+		MeshComponent->SetAnimInstanceClass(AnimClassRef.Class);
+	}
+
+
 
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("PawnMovement"));
 	PawnMovement->MaxSpeed = MaxSpeed; // 최대로 낼 수 있는 이동 속도

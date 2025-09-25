@@ -3,6 +3,9 @@
 
 #include "Pawn/LMBpawnPlayer.h"
 #include "Player/LMBPlayerController.h"
+#include "Animation/LMBAnimInstance.h"
+#include "GameFramework/FloatingPawnMovement.h"
+
 
 ALMBpawnPlayer::ALMBpawnPlayer()
 {
@@ -12,6 +15,7 @@ ALMBpawnPlayer::ALMBpawnPlayer()
 void ALMBpawnPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+    ULMBAnimInstance* AnimInstance = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance());
 
 	APlayerController* FirstPlayerController = GetWorld()->GetFirstPlayerController();
 	ALMBPlayerController* LMBPlayerController = Cast<ALMBPlayerController>(FirstPlayerController);
@@ -54,6 +58,10 @@ void ALMBpawnPlayer::OnInputMove(const FVector2D& MoveVector)
 
 void ALMBpawnPlayer::RotateTowardMovement(const FVector& MoveDir, float DeltaTime)
 {
+	if (bIsAttacking)
+	{
+		return;
+	}
 	
 		// 입력값이 있다.
 		FRotator TargetRot = MoveDir.Rotation();
@@ -64,4 +72,24 @@ void ALMBpawnPlayer::RotateTowardMovement(const FVector& MoveDir, float DeltaTim
 		FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, RoatationTnterSpeed);
 		SetActorRotation(NewRot);
 	
+}
+
+void ALMBpawnPlayer::StartAttack()
+{
+	if (bIsAttacking)
+	{
+		return;
+	}
+	bIsAttacking = true;
+	PawnMovement->StopMovementImmediately();
+	PawnMovement->Deactivate();
+	LMBAnim->PlayAttackMontage();
+
+}
+
+void ALMBpawnPlayer::EndAttack()
+{
+	bIsAttacking = false;
+
+	PawnMovement->Activate();
 }

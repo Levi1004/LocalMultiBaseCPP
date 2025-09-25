@@ -33,6 +33,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float RoatationTnterSpeed = 10.0f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack")
+	uint8 bIsAttacking : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	TObjectPtr<class ULMBAnimInstance> LMBAnim;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	FORCEINLINE int32 GetPlayerIndex() const { return PlayerIndex; }
@@ -43,4 +49,6 @@ public:
 public:
 	void OnInputMove(const FVector2D& MoveVector);
 	void RotateTowardMovement(const FVector& MoveDir, float DeltaTime);
+	void StartAttack();
+	void EndAttack();
 };

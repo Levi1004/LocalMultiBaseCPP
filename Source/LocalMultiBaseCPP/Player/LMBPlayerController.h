@@ -36,6 +36,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class UInputAction* IA_Move2P;
 
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	class UInputAction* IA_Attack1P;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	class UInputAction* IA_Attack2P;
+
 	public:
 		UFUNCTION(BlueprintCallable, Category = "Player")
 		void AddPawnPlayer(class ALMBpawnPlayer* NewPlayer);
@@ -43,4 +49,6 @@ protected:
 private:
 	void OnInputMove1P(const struct FInputActionValue& Value);
 	void OnInputMove2P(const struct FInputActionValue& Value);
+	void OnAttack1P();
+	void OnAttack2P();
 };

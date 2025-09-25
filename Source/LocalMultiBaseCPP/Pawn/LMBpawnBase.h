@@ -30,4 +30,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float MaxSpeed = 500.0f;
 
+public:
+	FORCEINLINE class UFloatingPawnMovement* GetMovement() { return PawnMovement; };
+
 };

@@ -31,6 +31,17 @@ ALMBPlayerController::ALMBPlayerController()
 		IA_Move2P = Move2PObj.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> Attack1PObj(TEXT("/Game/LMBCPP/Inputs/IA_Attack1P.IA_Attack1P"));
+	if (Attack1PObj.Succeeded())
+	{
+		IA_Attack1P = Attack1PObj.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> Attack2PObj(TEXT("/Game/LMBCPP/Inputs/IA_Attack2P.IA_Attack2P"));
+	if (Attack2PObj.Succeeded())
+	{
+		IA_Attack2P = Attack2PObj.Object;
+	}
 }
 
 void ALMBPlayerController::BeginPlay()
@@ -56,10 +67,15 @@ void ALMBPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(IA_Move1P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnInputMove1P);
 		EnhancedInputComponent->BindAction(IA_Move1P, ETriggerEvent::Completed, this, &ALMBPlayerController::OnInputMove1P);
 	}
-	if (IA_Move2P)
+	if (IA_Attack1P)
 	{
-		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnInputMove2P);
-		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Completed, this, &ALMBPlayerController::OnInputMove2P);
+		EnhancedInputComponent->BindAction(IA_Attack1P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnAttack1P);
+		
+	}
+	if (IA_Attack2P)
+	{
+		EnhancedInputComponent->BindAction(IA_Attack2P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnAttack2P);
+		
 	}
 }
 
@@ -86,4 +102,14 @@ void ALMBPlayerController::OnInputMove1P(const FInputActionValue& Value)
 void ALMBPlayerController::OnInputMove2P(const FInputActionValue& Value)
 {
 	PawnPlayers[1]->OnInputMove(Value.Get<FVector2D>());
+}
+
+void ALMBPlayerController::OnAttack1P()
+{
+	PawnPlayers[0]->StartAttack();
+}
+
+void ALMBPlayerController::OnAttack2P()
+{
+	PawnPlayers[1]->StartAttack();
 }
