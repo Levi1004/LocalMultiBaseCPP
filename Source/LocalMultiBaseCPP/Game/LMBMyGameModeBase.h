@@ -42,4 +42,6 @@ private:
 		UWorld* World, 
 		class APlayerStart* PlayerStart, 
 		class APlayerController* PlayerController);
+
+
 };

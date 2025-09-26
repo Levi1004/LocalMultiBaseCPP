@@ -46,13 +46,17 @@ ALMBpawnBase::ALMBpawnBase()
 		MeshComponent->SetAnimInstanceClass(AnimClassRef.Class);
 	}
 
-
+	
 
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("PawnMovement"));
 	PawnMovement->MaxSpeed = MaxSpeed; // 최대로 낼 수 있는 이동 속도
 	PawnMovement->Acceleration = 2048.0f; // 얼마나 빠르게 속도가 증가할 지
 	PawnMovement->Deceleration = 2000.0f; // 얼마나 빠르게 감속할 지 
 	PawnMovement->TurningBoost = 8.0f; // 회전을 얼마나 민첩하게할 지
+
+	CurrentHealth = MaxHealth;
+	UE_LOG(LogTemp, Warning, TEXT("플레이어 0의 현재 체력 %f"), CurrentHealth);
+	
 
 
 }

@@ -1,0 +1,44 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "ActorMonsterBase.generated.h"
+
+UCLASS()
+class LOCALMULTIBASECPP_API AActorMonsterBase : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AActorMonsterBase();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* BoxComp;
+	
+	UPROPERTY(VisibleAnywhere)
+	class UStaticMeshComponent* MeshComp; 
+
+	UPROPERTY(EditAnywhere)
+	int32 TraceRate = 25;
+	
+	UPROPERTY(EditAnywhere)
+	float MoveSpeed = 300.0f;
+private:
+	FVector Direction;
+
+
+
+
+
+};

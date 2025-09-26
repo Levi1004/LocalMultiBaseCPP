@@ -31,6 +31,26 @@ protected:
 	float MaxSpeed = 500.0f;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerName")
+	FString PlayerName = TEXT("Adventurer");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxHealth = 200.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float CurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float AttackPower = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float Defence = 5.0f;	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	int32 Level = 1;
+
+
+public:
 	FORCEINLINE class UFloatingPawnMovement* GetMovement() { return PawnMovement; };
 
 };
