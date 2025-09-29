@@ -6,7 +6,9 @@
 #include "Animation/LMBAnimInstance.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
-#include <Camera/CameraComponent.h>
+#include "Camera/CameraComponent.h"
+
+
 
 
 
@@ -14,6 +16,7 @@ ALMBpawnPlayer::ALMBpawnPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetUsingAbsoluteRotation(true);
@@ -22,6 +25,9 @@ ALMBpawnPlayer::ALMBpawnPlayer()
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	cameraComp->SetupAttachment(springArmComp);
 	
+	
+
+
 }
 
 void ALMBpawnPlayer::PossessedBy(AController* NewController)

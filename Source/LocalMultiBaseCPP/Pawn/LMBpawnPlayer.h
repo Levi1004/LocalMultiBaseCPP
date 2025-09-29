@@ -61,5 +61,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* cameraComp;
-	
+
+
 };
