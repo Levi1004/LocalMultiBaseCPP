@@ -26,9 +26,7 @@ AActorMonsterBase::AActorMonsterBase()
 	if (MeshAsset.Succeeded())
 	{
 		MeshComp->SetStaticMesh(MeshAsset.Object);
-		// pitch : Y
-		// Yaw : Z
-		// Roll : X
+		
 		MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f));
 		MeshComp->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 		MeshComp->SetWorldScale3D(FVector(1.0f));
@@ -50,10 +48,8 @@ void AActorMonsterBase::BeginPlay()
 	Super::BeginPlay();
 	Direction = FVector(1.0f, 0.0f, 0.0f);
 
-	// 확률에 따라 다른방향으로 직진하는거 만들고
-	// 최대 5마리가 되면 스폰 멈추는 기능 만들고
-	// 일정 범위 안에서 머물도록 만들고 
-	
+	StartLocation = GetActorLocation();
+	bHasReachedDistance = false;
 
 
 
@@ -64,10 +60,16 @@ void AActorMonsterBase::BeginPlay()
 // Called every frame
 void AActorMonsterBase::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	if (!bHasReachedDistance)
+	{
+		FVector NewLocation = GetActorLocation() + Direction * MoveSpeed * DeltaTime;
+		SetActorLocation(NewLocation);
 
-	FVector NewLocation = GetActorLocation() + Direction * MoveSpeed * DeltaTime;
-	SetActorLocation(NewLocation);
-
+		float TraveledDistance = FVector::Dist(StartLocation, NewLocation);
+		if (TraveledDistance >= MaxMoveDirection)
+		{
+			bHasReachedDistance = true;
+		}
+	}
 }
 

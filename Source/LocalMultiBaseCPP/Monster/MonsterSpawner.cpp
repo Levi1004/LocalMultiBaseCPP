@@ -47,18 +47,15 @@ void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
-	
-	
-	
-	
-	if (EnemyClass)
-	{
-		GetWorld()->SpawnActor<AActorMonsterBase>(EnemyClass, GetActorLocation(), GetActorRotation());
-	}
+	SpawnOffsets.Add(FVector(200, 0, 0));
+	SpawnOffsets.Add(FVector(200, 200, 0));
+	SpawnOffsets.Add(FVector(0, 200, 0));
+	SpawnOffsets.Add(FVector(-200, 200, 0));
+	SpawnOffsets.Add(FVector(200, -200, 0));
 
+	CurrentSpawnIndex = 0;
 	CurrentTime = 0.0f;
-	DelayTime = 5.0f;
+	DelayTime = 2.0f;
 
 }
 
@@ -67,14 +64,25 @@ void AMonsterSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	CurrentTime += DeltaTime;
-
-	if (CurrentTime >= DelayTime)
+	if (CurrentTime >= DelayTime && SpawnedMonsters.Num() < MaxSpawnCount)
 	{
 		CurrentTime = 0.0f;
 
-		if (EnemyClass)
+		if (EnemyClass && SpawnOffsets.Num() > 0)
 		{
-			GetWorld()->SpawnActor<AActorMonsterBase>(EnemyClass, GetActorLocation(), GetActorRotation());
+			FVector SpawnLocation = GetActorLocation() + SpawnOffsets[CurrentSpawnIndex];
+			FRotator SpawnRotation = GetActorRotation();
+
+			AActorMonsterBase* NewMonster = GetWorld()->SpawnActor<AActorMonsterBase>(EnemyClass, SpawnLocation, SpawnRotation);
+
+			if (NewMonster)
+			{
+				SpawnedMonsters.Add(NewMonster);
+				CurrentSpawnIndex = (CurrentSpawnIndex + 1) % SpawnOffsets.Num();
+			}
+
+
+
 		}
 	}
 }

@@ -50,6 +50,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Spawner")
 	TSubclassOf<class AActorMonsterBase> EnemyClass;
 
+	UPROPERTY(EditAnywhere, Category = "SpawneLocation")
+	TArray<FVector> SpawnOffsets;
 
+	int32 CurrentSpawnIndex;
+
+	UPROPERTY()
+	TArray<AActorMonsterBase*> SpawnedMonsters;
+
+	UPROPERTY(EditAnywhere, Category = "SpawnCount")
+	int32 MaxSpawnCount = 5;
 
 };

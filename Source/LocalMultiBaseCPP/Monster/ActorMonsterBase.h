@@ -32,10 +32,24 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 TraceRate = 25;
 	
-	UPROPERTY(EditAnywhere)
-	float MoveSpeed = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
+	int32 Hp = 50;
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	FVector Direction = FVector(1, 0, 0);
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float MoveSpeed = 500.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float MaxMoveDirection = 300.0f;
+
 private:
-	FVector Direction;
+	FVector StartLocation;
+	bool bHasReachedDistance = false;
+
 
 
 
