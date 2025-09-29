@@ -28,7 +28,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "PlayerStat")
 	TArray<FName> PlayerStartTags = { TEXT("Start1P"), TEXT("Start2P") };
 
-	UPROPERTY(VisibleAnywhere, Category = "Player")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ALMBpawnPlayer> LMBpawnPlayerClass;
 
 private:

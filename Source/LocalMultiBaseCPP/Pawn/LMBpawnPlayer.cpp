@@ -5,11 +5,23 @@
 #include "Player/LMBPlayerController.h"
 #include "Animation/LMBAnimInstance.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/SpringArmComponent.h"
+#include <Camera/CameraComponent.h>
+
 
 
 ALMBpawnPlayer::ALMBpawnPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	springArmComp->SetupAttachment(RootComponent);
+	springArmComp->SetUsingAbsoluteRotation(true);
+	springArmComp->SetWorldRotation(FRotator(-30.f, 0.f, 0.f));
+	springArmComp->TargetArmLength = 1000;
+	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+	cameraComp->SetupAttachment(springArmComp);
+	
 }
 
 void ALMBpawnPlayer::PossessedBy(AController* NewController)
@@ -17,6 +29,11 @@ void ALMBpawnPlayer::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
     ULMBAnimInstance* AnimInstance = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance());
 	LMBAnim = AnimInstance;
+	
+	if (APlayerController* PC = Cast<APlayerController>(NewController))
+	{
+		PC->SetViewTarget(this);
+	}
 
 	APlayerController* FirstPlayerController = GetWorld()->GetFirstPlayerController();
 	ALMBPlayerController* LMBPlayerController = Cast<ALMBPlayerController>(FirstPlayerController);

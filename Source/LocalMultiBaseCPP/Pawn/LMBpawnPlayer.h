@@ -6,6 +6,8 @@
 #include "Pawn/LMBpawnBase.h"
 #include "LMBpawnPlayer.generated.h"
 
+
+
 /**
  * 
  */
@@ -39,6 +41,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<class ULMBAnimInstance> LMBAnim;
 
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	FORCEINLINE int32 GetPlayerIndex() const { return PlayerIndex; }
@@ -51,4 +54,12 @@ public:
 	void RotateTowardMovement(const FVector& MoveDir, float DeltaTime);
 	void StartAttack();
 	void EndAttack();
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class USpringArmComponent* springArmComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class UCameraComponent* cameraComp;
+	
 };

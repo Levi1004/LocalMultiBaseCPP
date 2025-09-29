@@ -34,6 +34,8 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
 	int32 Hp = 50;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
+	int32 AttackPower = 3;
 
 public:
 

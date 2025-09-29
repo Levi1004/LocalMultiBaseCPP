@@ -27,7 +27,7 @@ AActorMonsterBase::AActorMonsterBase()
 	{
 		MeshComp->SetStaticMesh(MeshAsset.Object);
 		
-		MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f));
+		MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 		MeshComp->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 		MeshComp->SetWorldScale3D(FVector(1.0f));
 	}

@@ -30,15 +30,18 @@ AMonsterSpawner::AMonsterSpawner()
 	if (MeshAsset.Succeeded())
 	{
 		MeshComp->SetStaticMesh(MeshAsset.Object);
-		// pitch : Y
-		// Yaw : Z
-		// Roll : X
+		
 		MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));	
 		MeshComp->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Static Mesh를 가져오지 못했습니다."));
+	}
+	static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+	if (MatAsset.Succeeded())
+	{
+		MeshComp->SetMaterial(0, MatAsset.Object);
 	}
 }
 
