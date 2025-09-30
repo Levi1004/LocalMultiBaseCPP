@@ -50,6 +50,7 @@ public:
 	int32 Level = 1;
 
 
+
 public:
 	FORCEINLINE class UFloatingPawnMovement* GetMovement() { return PawnMovement; };
 

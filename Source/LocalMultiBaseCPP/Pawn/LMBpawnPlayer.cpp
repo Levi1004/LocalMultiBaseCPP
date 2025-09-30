@@ -7,28 +7,25 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-
-
-
-
+#include "Components/BoxComponent.h"
 
 ALMBpawnPlayer::ALMBpawnPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	
-	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	BoxComponent->SetCollisionProfileName(TEXT("PlayerProfile"));
+
+    springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetUsingAbsoluteRotation(true);
 	springArmComp->SetWorldRotation(FRotator(-30.f, 0.f, 0.f));
 	springArmComp->TargetArmLength = 1000;
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	cameraComp->SetupAttachment(springArmComp);
-	
-	
 
-
+	
 }
+
 
 void ALMBpawnPlayer::PossessedBy(AController* NewController)
 {

@@ -54,13 +54,12 @@ public:
 	void RotateTowardMovement(const FVector& MoveDir, float DeltaTime);
 	void StartAttack();
 	void EndAttack();
-
+	
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class USpringArmComponent* springArmComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* cameraComp;
-
 
 };
