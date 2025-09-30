@@ -26,7 +26,7 @@ AMonsterSpawner::AMonsterSpawner()
 	MeshComp->SetupAttachment(BoxComp);
 
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/Assets/simple-stone-portal/textures/SM_Monster_Portal.SM_Monster_Portal"));
 	if (MeshAsset.Succeeded())
 	{
 		MeshComp->SetStaticMesh(MeshAsset.Object);
@@ -38,7 +38,7 @@ AMonsterSpawner::AMonsterSpawner()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Static Mesh를 가져오지 못했습니다."));
 	}
-	static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Game/Assets/simple-stone-portal/textures/SM_Monster_Portal.SM_Monster_Portal"));
 	if (MatAsset.Succeeded())
 	{
 		MeshComp->SetMaterial(0, MatAsset.Object);
