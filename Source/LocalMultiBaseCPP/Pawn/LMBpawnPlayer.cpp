@@ -22,29 +22,47 @@
 		springArmComp->TargetArmLength = 1000;
 		cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 		cameraComp->SetupAttachment(springArmComp);
-
-		Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-		Weapon->SetupAttachment(RootComponent);
-		
-		static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WEAPON(TEXT("/Game/InfinityBladeWeapons/Weapons/Blade/Swords/Blade_HeroSword11/SK_Blade_HeroSword11.SK_Blade_HeroSword11"));
-		if (SK_WEAPON.Succeeded())
-		{
-			Weapon->SetSkeletalMesh(SK_WEAPON.Object);
-		}
-
-		FName WeaponSocket(TEXT("hand_rSocket"));
-		if (MeshComponent->DoesSocketExist(WeaponSocket))
-		{
-			Weapon->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-		}
-	
 	}
-
-	void ALMBpawnPlayer::BeginPlay()
+	void ALMBpawnPlayer::AttachWeaponByPlayerIndex()
 	{
-		Super::BeginPlay();
-		
+		FName WeaponSocket(TEXT("hand_rSocket"));
+
+		if (PlayerIndex == 0)
+		{
+			// SkeletalMesh
+			if (!WeaponSkeletal)
+			{
+				WeaponSkeletal = NewObject<USkeletalMeshComponent>(this, TEXT("WeaponSkeletal"));
+				WeaponSkeletal->RegisterComponent();
+				WeaponSkeletal->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			}
+
+			USkeletalMesh* SwordMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/InfinityBladeWeapons/Weapons/Blade/Swords/Blade_HeroSword11/SK_Blade_HeroSword11.SK_Blade_HeroSword11"));
+			if (SwordMesh)
+			{
+				WeaponSkeletal->SetSkeletalMesh(SwordMesh);
+			}
+		}
+		else if (PlayerIndex == 1)
+		{
+			// StaticMesh
+			if (!WeaponStatic)
+			{
+				WeaponStatic = NewObject<UStaticMeshComponent>(this, TEXT("WeaponStatic"));
+				WeaponStatic->RegisterComponent();
+				WeaponStatic->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+			}
+
+			UStaticMesh* StaffMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Assets/source/SM_Staff.SM_Staff"));
+			if (StaffMesh)
+			{
+				WeaponStatic->SetStaticMesh(StaffMesh);
+			}
+		}
 	}
+		
+	
+	
 	void ALMBpawnPlayer::PossessedBy(AController* NewController)
 	{
 		Super::PossessedBy(NewController);
