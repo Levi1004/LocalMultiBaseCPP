@@ -58,9 +58,10 @@
 			{
 				WeaponStatic->SetStaticMesh(StaffMesh);
 			}
+			WeaponStatic->SetRelativeLocation(FVector(-14.11043f, 5.434529f, 29.451223f));
+			WeaponStatic->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
 		}
 	}
-		
 	
 	
 	void ALMBpawnPlayer::PossessedBy(AController* NewController)
