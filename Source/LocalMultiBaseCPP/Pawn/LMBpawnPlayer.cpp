@@ -132,11 +132,15 @@
 		if (bIsAttacking || MoveDir.IsNearlyZero())
 			return;
 
+		float ForwardDot = FVector::DotProduct(GetActorForwardVector(), MoveDir);
+		if (ForwardDot < 0.f) // 뒤로 이동
+			return;
+
 		FRotator TargetRot = MoveDir.Rotation();
 		TargetRot.Pitch = 0.f;
 		TargetRot.Roll = 0.f;
 
-		FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, RoatationInterSpeed);
+		FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, RoatationInterpSpeed);
 		SetActorRotation(NewRot);
 	}
 
