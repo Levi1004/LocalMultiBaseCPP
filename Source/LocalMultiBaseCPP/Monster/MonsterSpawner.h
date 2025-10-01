@@ -51,4 +51,6 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "Spawner")
 	TArray<FVector> SpreadOffsets;
+	
+	
 };

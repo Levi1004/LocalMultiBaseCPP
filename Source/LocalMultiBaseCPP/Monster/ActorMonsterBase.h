@@ -59,7 +59,7 @@ public:
 
 	FVector FreeMoveTarget;
 	bool bHasFreeTarget = false;
-	
+	float FreeMoveWaitTime = 0.f;
 	FVector StartLocation;
 	bool bHasReachedDistance = false;
 	
