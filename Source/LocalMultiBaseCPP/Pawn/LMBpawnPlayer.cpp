@@ -17,11 +17,14 @@
 
 		springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 		springArmComp->SetupAttachment(RootComponent);
-		springArmComp->SetUsingAbsoluteRotation(true);
-		springArmComp->SetWorldRotation(FRotator(-30.f, 0.f, 0.f));
-		springArmComp->TargetArmLength = 1000;
+		springArmComp->SetUsingAbsoluteRotation(false);
+		springArmComp->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
+		springArmComp->TargetArmLength = 1000.0f;
+		springArmComp->bUsePawnControlRotation = false;
+		
 		cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 		cameraComp->SetupAttachment(springArmComp);
+		cameraComp->bUsePawnControlRotation = false;
 	}
 	void ALMBpawnPlayer::AttachWeaponByPlayerIndex()
 	{
@@ -87,7 +90,13 @@
 
 		if (LastMoveDirection.SizeSquared() > KINDA_SMALL_NUMBER) //LastMoveDirection이 0이 아니라면
 		{
-			RotateTowardMovement(LastMoveDirection, DeltaTime);
+			// 뒤로 이동 시는 회전하지 않음
+			if (!LastMoveDirection.IsNearlyZero())
+			{
+				RotateTowardMovement(LastMoveDirection, DeltaTime);
+			}
+				
+			
 		}
 	}
 
@@ -99,55 +108,57 @@
 			LastMoveDirection = FVector::ZeroVector;
 			return;
 		}
-		// 입력값이 있다.
-		// 컨트롤러의 Yaw를 기준으로 회전축을 저으이
-		FRotator ControlRot = GetControlRotation();
-		ControlRot.Pitch = 0.0f;
-		ControlRot.Roll = 0.0f;
+		FVector CamForward = cameraComp->GetForwardVector();
+		FVector CamRight = cameraComp->GetRightVector();
 
-		FVector Forward = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::X);
-		FVector Right = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
+		// Pitch 제거해서 평면 이동
+		CamForward.Z = 0.f;
+		CamRight.Z = 0.f;
+		CamForward.Normalize();
+		CamRight.Normalize();
 
-		// 이동방향 
-		LastMoveDirection = (Forward * MoveVector.X + Right * MoveVector.Y).GetSafeNormal();
+		// 입력 방향 계산
+		LastMoveDirection = (CamForward * MoveVector.X + CamRight * MoveVector.Y).GetSafeNormal();
 
+		// 이동 적용
 		AddMovementInput(LastMoveDirection);
+
+		// 회전 적용
+		RotateTowardMovement(LastMoveDirection, GetWorld()->GetDeltaSeconds());
 	}
 
 	void ALMBpawnPlayer::RotateTowardMovement(const FVector& MoveDir, float DeltaTime)
 	{
-		if (bIsAttacking)
-		{
+		if (bIsAttacking || MoveDir.IsNearlyZero())
 			return;
-		}
-	
-			// 입력값이 있다.
-			FRotator TargetRot = MoveDir.Rotation();
-			TargetRot.Pitch = 0.0f;
-			TargetRot.Roll = 0.0f;
-		
-			FRotator CurrentRot = GetActorRotation();
-			FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, RoatationTnterSpeed);
-			SetActorRotation(NewRot);
-	
+
+		FRotator TargetRot = MoveDir.Rotation();
+		TargetRot.Pitch = 0.f;
+		TargetRot.Roll = 0.f;
+
+		FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, RoatationInterSpeed);
+		SetActorRotation(NewRot);
 	}
 
 	void ALMBpawnPlayer::StartAttack()
 	{
-		if (bIsAttacking)
-		{
-			return;
-		}
-		bIsAttacking = true;
-		PawnMovement->StopMovementImmediately();
-		PawnMovement->Deactivate();
-		LMBAnim->PlayAttackMontage();
+		
+			if (bIsAttacking)
+				return;
 
+		bIsAttacking = true;
+		if (PawnMovement)
+		{
+			PawnMovement->StopMovementImmediately();
+			PawnMovement->Deactivate();
+		}
+		if (LMBAnim)
+			LMBAnim->PlayAttackMontage();
 	}
 
 	void ALMBpawnPlayer::EndAttack()
 	{
 		bIsAttacking = false;
-
-		PawnMovement->Activate();
+            if (PawnMovement)
+			PawnMovement->Activate();
 	}

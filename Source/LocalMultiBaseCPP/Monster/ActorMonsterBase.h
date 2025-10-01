@@ -6,6 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "ActorMonsterBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EMonsterMovePhase : uint8
+{
+	InitialForward, 
+	FreeMovement 
+};
 
 UCLASS()
 class LOCALMULTIBASECPP_API AActorMonsterBase : public AActor
@@ -44,13 +50,20 @@ public:
 	FVector Direction = FVector(1, 0, 0);
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float MoveSpeed = 500.0f;
+	float MoveSpeed = 300.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float MaxMoveDirection = 300.0f;
+	float MaxForwardDistance = 700.0f;
+    UPROPERTY(EditAnywhere, Category = "Movement")
+	float FreeMoveRange = 300.f;
 
-    FVector StartLocation;
+	FVector FreeMoveTarget;
+	bool bHasFreeTarget = false;
+	
+	FVector StartLocation;
 	bool bHasReachedDistance = false;
+	
+	EMonsterMovePhase MovePhase = EMonsterMovePhase::InitialForward;
 
 
 

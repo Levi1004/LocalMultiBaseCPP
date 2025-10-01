@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MonsterSpawner.generated.h"
 
+class AActorMonsterBase;
+
 UCLASS()
 class LOCALMULTIBASECPP_API AMonsterSpawner : public AActor
 {
@@ -27,38 +29,26 @@ public:
   
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "DealyTime")
-	float DelayTime = 10.0f;
+	UPROPERTY(EditAnywhere, Category = "DelayTime")
+	float DelayTime = 3.0f;
 	
 private:
 	float CurrentTime = 0.0f;
-
+	TArray<FVector> SpreadDirections;
+	TArray<AActorMonsterBase*> SpawnedMonsters;
 public:
-
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(EditAnywhere)
-	int32 TraceRate = 25;
-
-	UPROPERTY(EditAnywhere)
-	float MoveSpeed = 0.0f;
-
 	UPROPERTY(EditAnywhere, Category = "Spawner")
-	TSubclassOf<class AActorMonsterBase> EnemyClass;
-
-	UPROPERTY(EditAnywhere, Category = "SpawneLocation")
-	TArray<FVector> SpawnOffsets;
-
-	int32 CurrentSpawnIndex;
-
-	UPROPERTY()
-	TArray<AActorMonsterBase*> SpawnedMonsters;
+	TSubclassOf<AActorMonsterBase> EnemyClass;
 
 	UPROPERTY(EditAnywhere, Category = "SpawnCount")
 	int32 MaxSpawnCount = 5;
 
+    UPROPERTY(EditAnywhere, Category = "Spawner")
+	TArray<FVector> SpreadOffsets;
 };

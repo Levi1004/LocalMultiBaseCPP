@@ -30,9 +30,8 @@ AMonsterSpawner::AMonsterSpawner()
 	if (MeshAsset.Succeeded())
 	{
 		MeshComp->SetStaticMesh(MeshAsset.Object);
-		
-		MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));	
-		MeshComp->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+		MeshComp->SetRelativeLocation(FVector::ZeroVector);
+		MeshComp->SetRelativeRotation(FRotator::ZeroRotator);
 	}
 	else
 	{
@@ -43,21 +42,14 @@ AMonsterSpawner::AMonsterSpawner()
 	{
 		MeshComp->SetMaterial(0, MatAsset.Object);
 	}
+
 }
 
 // Called when the game starts or when spawned
 void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SpawnOffsets.Add(FVector(0, 0, 0));
-	
-	
-
-	CurrentSpawnIndex = 0;
-	CurrentTime = 0.0f;
-	DelayTime = 2.0f;
-
+	CurrentTime = 0.f;
 }
 
 
@@ -67,14 +59,12 @@ void AMonsterSpawner::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 	
 	CurrentTime += DeltaTime;
-	
 	if (CurrentTime >= DelayTime && SpawnedMonsters.Num() < MaxSpawnCount)
 	{
-		CurrentTime = 0.0f;
+		CurrentTime = 0.f;
 
 		if (EnemyClass)
 		{
-			// 1️ 포탈 위치에서 Spawn
 			FVector SpawnLocation = GetActorLocation();
 			FRotator SpawnRotation = GetActorRotation();
 
@@ -83,19 +73,14 @@ void AMonsterSpawner::Tick(float DeltaTime)
 			{
 				SpawnedMonsters.Add(NewMonster);
 
-				// 2️ Spawn 직후 포탈 앞으로 전진
-				FVector ForwardOffset = NewMonster->GetActorForwardVector() * 100.0f; // 100 유니트 전진
-				NewMonster->SetActorLocation(SpawnLocation + ForwardOffset);
-
-				// 3️ 이후 퍼지도록 랜덤 방향 지정
-				float Angle = FMath::RandRange(0.0f, 2 * PI);
-				NewMonster->Direction = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0);
-
-				// 4️ Tick 이동용 초기값
-				NewMonster->StartLocation = NewMonster->GetActorLocation();
+				// 전방 이동만 지정
+				NewMonster->StartLocation = SpawnLocation;
+				NewMonster->Direction = FVector(1, 0, 0); // 포탈 뒤쪽이 정면
+				NewMonster->MovePhase = EMonsterMovePhase::InitialForward;
 				NewMonster->bHasReachedDistance = false;
 			}
 		}
 	}
+	
 }
 

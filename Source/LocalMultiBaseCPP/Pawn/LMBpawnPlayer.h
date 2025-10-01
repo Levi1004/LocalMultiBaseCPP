@@ -34,7 +34,7 @@ protected:
 	int32 PlayerIndex = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float RoatationTnterSpeed = 10.0f;
+	float RoatationInterSpeed = 3.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack")
 	uint8 bIsAttacking : 1;
