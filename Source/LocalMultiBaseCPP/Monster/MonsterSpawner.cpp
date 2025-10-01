@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Monster/MonsterSpawner.h"
@@ -36,7 +36,7 @@ AMonsterSpawner::AMonsterSpawner()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Static Mesh�� �������� ���߽��ϴ�."));
+		UE_LOG(LogTemp, Error, TEXT("Static Mesh를 가져오지 못했습니다."));
 	}
 	static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Game/Assets/simple-stone-portal/textures/SM_Monster_Portal.SM_Monster_Portal"));
 	if (MatAsset.Succeeded())
@@ -50,11 +50,9 @@ void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnOffsets.Add(FVector(200, 0, 0));
-	SpawnOffsets.Add(FVector(200, 200, 0));
-	SpawnOffsets.Add(FVector(0, 200, 0));
-	SpawnOffsets.Add(FVector(-200, 200, 0));
-	SpawnOffsets.Add(FVector(200, -200, 0));
+	SpawnOffsets.Add(FVector(0, 0, 0));
+	
+	
 
 	CurrentSpawnIndex = 0;
 	CurrentTime = 0.0f;
@@ -62,30 +60,41 @@ void AMonsterSpawner::BeginPlay()
 
 }
 
+
 // Called every frame
 void AMonsterSpawner::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
+	
 	CurrentTime += DeltaTime;
+	
 	if (CurrentTime >= DelayTime && SpawnedMonsters.Num() < MaxSpawnCount)
 	{
 		CurrentTime = 0.0f;
 
-		if (EnemyClass && SpawnOffsets.Num() > 0)
+		if (EnemyClass)
 		{
-			FVector SpawnLocation = GetActorLocation() + SpawnOffsets[CurrentSpawnIndex];
+			// 1️ 포탈 위치에서 Spawn
+			FVector SpawnLocation = GetActorLocation();
 			FRotator SpawnRotation = GetActorRotation();
 
 			AActorMonsterBase* NewMonster = GetWorld()->SpawnActor<AActorMonsterBase>(EnemyClass, SpawnLocation, SpawnRotation);
-
 			if (NewMonster)
 			{
 				SpawnedMonsters.Add(NewMonster);
-				CurrentSpawnIndex = (CurrentSpawnIndex + 1) % SpawnOffsets.Num();
+
+				// 2️ Spawn 직후 포탈 앞으로 전진
+				FVector ForwardOffset = NewMonster->GetActorForwardVector() * 100.0f; // 100 유니트 전진
+				NewMonster->SetActorLocation(SpawnLocation + ForwardOffset);
+
+				// 3️ 이후 퍼지도록 랜덤 방향 지정
+				float Angle = FMath::RandRange(0.0f, 2 * PI);
+				NewMonster->Direction = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0);
+
+				// 4️ Tick 이동용 초기값
+				NewMonster->StartLocation = NewMonster->GetActorLocation();
+				NewMonster->bHasReachedDistance = false;
 			}
-
-
-
 		}
 	}
 }

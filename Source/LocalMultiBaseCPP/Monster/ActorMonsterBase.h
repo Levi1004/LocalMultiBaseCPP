@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "ActorMonsterBase.generated.h"
 
+
 UCLASS()
 class LOCALMULTIBASECPP_API AActorMonsterBase : public AActor
 {
@@ -27,7 +28,7 @@ public:
 	class UBoxComponent* BoxComp;
 	
 	UPROPERTY(VisibleAnywhere)
-	class UStaticMeshComponent* MeshComp; 
+	class USkeletalMeshComponent* SkeletalMeshComp;
 
 	UPROPERTY(EditAnywhere)
 	int32 TraceRate = 25;
@@ -48,9 +49,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxMoveDirection = 300.0f;
 
-private:
-	FVector StartLocation;
+    FVector StartLocation;
 	bool bHasReachedDistance = false;
+
+
 
 
 

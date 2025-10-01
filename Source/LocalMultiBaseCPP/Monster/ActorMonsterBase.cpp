@@ -19,34 +19,35 @@ AActorMonsterBase::AActorMonsterBase()
 	BoxComp->SetBoxExtent(BoxSize);
 	BoxComp->SetCollisionProfileName(TEXT("EnemyProfile"));
 	
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("My Static Mesh"));
-	MeshComp->SetupAttachment(BoxComp);
+	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("My Skeletal Mesh"));
+	SkeletalMeshComp->SetupAttachment(BoxComp);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT(" / Game / Assets / Goblin / Goblin.Goblin"));
 	if (MeshAsset.Succeeded())
 	{
-		MeshComp->SetStaticMesh(MeshAsset.Object);
+		SkeletalMeshComp->SetSkeletalMesh(MeshAsset.Object);
 		
-		MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		MeshComp->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
-		MeshComp->SetWorldScale3D(FVector(1.0f));
+		SkeletalMeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+		SkeletalMeshComp->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+		SkeletalMeshComp->SetWorldScale3D(FVector(1.0f));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Static Mesh를 가져오지 못했습니다."));
+		UE_LOG(LogTemp, Error, TEXT("SetSkeletalMesh 가져오지 못했습니다."));
 	}
-	static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+	/*static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
 	if (MatAsset.Succeeded())
 	{
-		MeshComp->SetMaterial(0, MatAsset.Object);
-	}
+		SkeletalMeshComp->SetMaterial(0, MatAsset.Object);
+	}*/
 }
 
 // Called when the game starts or when spawned
 void AActorMonsterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	Direction = FVector(1.0f, 0.0f, 0.0f);
+	
+	Direction = FVector(-1.0f, 0.0f, 0.0f);
 
 	StartLocation = GetActorLocation();
 	bHasReachedDistance = false;
