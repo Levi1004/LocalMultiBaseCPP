@@ -90,11 +90,11 @@
 
 		if (LastMoveDirection.SizeSquared() > KINDA_SMALL_NUMBER) //LastMoveDirection이 0이 아니라면
 		{
-			// 뒤로 이동 시는 회전하지 않음
-			if (!LastMoveDirection.IsNearlyZero())
+			if (!bIsAttacking && CurrentMoveVector.X > 0.0f)
 			{
 				RotateTowardMovement(LastMoveDirection, DeltaTime);
 			}
+			
 				
 			
 		}
@@ -102,38 +102,50 @@
 
 	void ALMBpawnPlayer::OnInputMove(const FVector2D& MoveVector)
 	{
-		if (MoveVector.IsNearlyZero())
-		{
-			// 입력값이 없다.
-			LastMoveDirection = FVector::ZeroVector;
-			return;
-		}
+		CurrentMoveVector = MoveVector;
+
 		FVector CamForward = cameraComp->GetForwardVector();
 		FVector CamRight = cameraComp->GetRightVector();
-
-		// Pitch 제거해서 평면 이동
 		CamForward.Z = 0.f;
 		CamRight.Z = 0.f;
 		CamForward.Normalize();
 		CamRight.Normalize();
 
-		// 입력 방향 계산
-		LastMoveDirection = (CamForward * MoveVector.X + CamRight * MoveVector.Y).GetSafeNormal();
+		if (!FMath::IsNearlyZero(MoveVector.X))
+		{
+			// 앞/뒤 이동
+			LastMoveDirection = (CamForward * MoveVector.X + CamRight * MoveVector.Y).GetSafeNormal();
+			AddMovementInput(LastMoveDirection);
 
-		// 이동 적용
-		AddMovementInput(LastMoveDirection);
+			if (MoveVector.X > 0.f)
+			{
+				// 앞으로 이동할 때만 캐릭터 회전
+				RotateTowardMovement(LastMoveDirection, GetWorld()->GetDeltaSeconds());
+			}
+			else if (!FMath::IsNearlyZero(MoveVector.Y))
+			{
+				// 뒤로 이동 중 좌/우 입력 → 이동 없이 카메라 회전
+				float YawDelta = MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
+				FRotator NewRotation = GetActorRotation();
+				NewRotation.Yaw += YawDelta;
+				SetActorRotation(NewRotation);
+			}
+		}
+		else if (!FMath::IsNearlyZero(MoveVector.Y))
+		{
+			// 좌/우 입력만 → 이동 없이 캐릭터 회전
+			float YawDelta = MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
+			FRotator NewRotation = GetActorRotation();
+			NewRotation.Yaw += YawDelta;
+			SetActorRotation(NewRotation);
+		}
 
-		// 회전 적용
-		RotateTowardMovement(LastMoveDirection, GetWorld()->GetDeltaSeconds());
+		
 	}
 
 	void ALMBpawnPlayer::RotateTowardMovement(const FVector& MoveDir, float DeltaTime)
 	{
 		if (bIsAttacking || MoveDir.IsNearlyZero())
-			return;
-
-		float ForwardDot = FVector::DotProduct(GetActorForwardVector(), MoveDir);
-		if (ForwardDot < 0.f) // 뒤로 이동
 			return;
 
 		FRotator TargetRot = MoveDir.Rotation();
@@ -166,3 +178,5 @@
             if (PawnMovement)
 			PawnMovement->Activate();
 	}
+
+

@@ -27,7 +27,7 @@ AActorMonsterBase::AActorMonsterBase()
 	{
 		SkeletalMeshComp->SetSkeletalMesh(MeshAsset.Object);
 		
-		SkeletalMeshComp->SetRelativeLocation(FVector::ZeroVector);
+		SkeletalMeshComp->SetRelativeRotation(FRotator(0.f, 0.f, -90.f));
 		SkeletalMeshComp->SetRelativeRotation(FRotator::ZeroRotator);
 		SkeletalMeshComp->SetWorldScale3D(FVector(1.0f));
 	}
@@ -50,6 +50,8 @@ void AActorMonsterBase::BeginPlay()
 	StartLocation = GetActorLocation();
 	bHasReachedDistance = false;
 	MovePhase = EMonsterMovePhase::InitialForward;
+
+	SetActorRotation(Direction.Rotation());
 }
 
 // Called every frame

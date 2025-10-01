@@ -75,7 +75,7 @@ void AMonsterSpawner::Tick(float DeltaTime)
 
 				// 전방 이동만 지정
 				NewMonster->StartLocation = SpawnLocation;
-				NewMonster->Direction = FVector(1, 0, 0); // 포탈 뒤쪽이 정면
+				NewMonster->Direction = FVector(1, 0, 0); 
 				NewMonster->MovePhase = EMonsterMovePhase::InitialForward;
 				NewMonster->bHasReachedDistance = false;
 			}

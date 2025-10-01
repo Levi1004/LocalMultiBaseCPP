@@ -34,7 +34,7 @@ protected:
 	int32 PlayerIndex = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float RoatationInterpSpeed = 3.0f;
+	float RoatationInterpSpeed = 2.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack")
 	uint8 bIsAttacking : 1;
@@ -72,6 +72,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	UStaticMeshComponent* WeaponStatic;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float CameraRotationSpeed = 100.f;
+
 public:
 	void AttachWeaponByPlayerIndex();
+
+private:
+	FVector2D CurrentMoveVector;
 };
