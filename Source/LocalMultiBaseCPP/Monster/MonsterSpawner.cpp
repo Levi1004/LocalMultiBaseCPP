@@ -18,7 +18,7 @@ AMonsterSpawner::AMonsterSpawner()
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("My Box Component"));
 	SetRootComponent(BoxComp);
 
-	FVector BoxSize = FVector(50.0f, 50.0f, 50.0f);
+	FVector BoxSize = FVector(100.0f, 100.0f, -200.0f);
 	BoxComp->SetBoxExtent(BoxSize);
 	BoxComp->SetCollisionProfileName(TEXT("EnemyProfile"));
 
@@ -26,7 +26,7 @@ AMonsterSpawner::AMonsterSpawner()
 	MeshComp->SetupAttachment(BoxComp);
 
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/Assets/simple-stone-portal/textures/SM_Monster_Portal.SM_Monster_Portal"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/Assets/SM_MERGED_StaticMeshActor_7.SM_MERGED_StaticMeshActor_7"));
 	if (MeshAsset.Succeeded())
 	{
 		MeshComp->SetStaticMesh(MeshAsset.Object);
@@ -37,7 +37,7 @@ AMonsterSpawner::AMonsterSpawner()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Static Mesh를 가져오지 못했습니다."));
 	}
-	static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Game/Assets/simple-stone-portal/textures/SM_Monster_Portal.SM_Monster_Portal"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Game/Assets/SM_MERGED_StaticMeshActor_7.SM_MERGED_StaticMeshActor_7"));
 	if (MatAsset.Succeeded())
 	{
 		MeshComp->SetMaterial(0, MatAsset.Object);

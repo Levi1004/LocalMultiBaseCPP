@@ -54,4 +54,7 @@ public:
 public:
 	FORCEINLINE class UFloatingPawnMovement* GetMovement() { return PawnMovement; };
 
+public:
+	virtual void BeginPlay() override;
+
 };
