@@ -53,7 +53,13 @@ void ALMBPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(IMC_LMBPlayerInput, 0);
 	}
+	for (int32 i = 0; i < PawnPlayers.Num(); i++)
+	{
+		PawnPlayers[i]->SetPlayerIndex(i);
+		PawnPlayers[i]->ApplyMeshByPlayerIndex();
+	}
 }
+
 
 void ALMBPlayerController::SetupInputComponent()
 {

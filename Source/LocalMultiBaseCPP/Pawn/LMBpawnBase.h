@@ -49,12 +49,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	int32 Level = 1;
 
-
-
-public:
-	FORCEINLINE class UFloatingPawnMovement* GetMovement() { return PawnMovement; };
+    FORCEINLINE class UFloatingPawnMovement* GetMovement() { return PawnMovement; };
 
 public:
 	virtual void BeginPlay() override;
+
+	void SetPlayerIndex(int32 NewIndex) { PlayerIndex = NewIndex; }
+	int32 GetPlayerIndex() const { return PlayerIndex; }
+
+	void ApplyMeshByPlayerIndex();
+protected:
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	int32 PlayerIndex = -1;
+
 
 };

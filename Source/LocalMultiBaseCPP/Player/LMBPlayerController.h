@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "LMBPlayerController.generated.h"
 
+
 /**
  * 
  */
@@ -23,9 +24,15 @@ protected:
 
 	virtual void SetupInputComponent() override;
 
+	UPROPERTY()
+	TArray<ALMBpawnPlayer*> PawnPlayers;
+public:
+	// 블루프린트에서 호출 가능
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void AddPawnPlayer(ALMBpawnPlayer* NewPlayer);
+	
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Player")
-	TArray<class ALMBpawnPlayer*> PawnPlayers;
+
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class UInputMappingContext* IMC_LMBPlayerInput;
@@ -41,10 +48,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class UInputAction* IA_Attack2P;
-
-	public:
-		UFUNCTION(BlueprintCallable, Category = "Player")
-		void AddPawnPlayer(class ALMBpawnPlayer* NewPlayer);
 
 private:
 	void OnInputMove1P(const struct FInputActionValue& Value);

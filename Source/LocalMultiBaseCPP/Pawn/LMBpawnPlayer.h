@@ -30,8 +30,7 @@ private:
 	FVector LastMoveDirection;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player")
-	int32 PlayerIndex = -1;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float RoatationInterpSpeed = 2.0f;
