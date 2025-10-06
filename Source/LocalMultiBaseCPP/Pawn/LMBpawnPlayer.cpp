@@ -1,4 +1,4 @@
-	// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿	// Fill out your copyright notice in the Description page of Project Settings.
 
 
 	#include "Pawn/LMBpawnPlayer.h"
@@ -23,48 +23,11 @@
 		springArmComp->TargetArmLength = 1000.0f;
 		springArmComp->bUsePawnControlRotation = false;
 		
+
+		
 		cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 		cameraComp->SetupAttachment(springArmComp);
 		cameraComp->bUsePawnControlRotation = false;
-	}
-	void ALMBpawnPlayer::AttachWeaponByPlayerIndex()
-	{
-		FName WeaponSocket(TEXT("hand_rSocket"));
-
-		if (PlayerIndex == 0)
-		{
-			// SkeletalMesh
-			if (!WeaponSkeletal)
-			{
-				WeaponSkeletal = NewObject<USkeletalMeshComponent>(this, TEXT("WeaponSkeletal"));
-				WeaponSkeletal->RegisterComponent();
-				WeaponSkeletal->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-			}
-
-			USkeletalMesh* SwordMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/InfinityBladeWeapons/Weapons/Blade/Swords/Blade_HeroSword11/SK_Blade_HeroSword11.SK_Blade_HeroSword11"));
-			if (SwordMesh)
-			{
-				WeaponSkeletal->SetSkeletalMesh(SwordMesh);
-			}
-		}
-		else if (PlayerIndex == 1)
-		{
-			// StaticMesh
-			if (!WeaponStatic)
-			{
-				WeaponStatic = NewObject<UStaticMeshComponent>(this, TEXT("WeaponStatic"));
-				WeaponStatic->RegisterComponent();
-				WeaponStatic->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-			}
-
-			UStaticMesh* StaffMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Assets/source/SM_Staff.SM_Staff"));
-			if (StaffMesh)
-			{
-				WeaponStatic->SetStaticMesh(StaffMesh);
-			}
-			WeaponStatic->SetRelativeLocation(FVector(-14.11043f, 5.434529f, 29.451223f));
-			WeaponStatic->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
-		}
 	}
 	
 	
@@ -84,12 +47,12 @@
 
 		LMBPlayerController->AddPawnPlayer(this);
 	}
-
+	
 	void ALMBpawnPlayer::Tick(float DeltaTime)
 	{
 		Super::Tick(DeltaTime);
 
-		if (LastMoveDirection.SizeSquared() > KINDA_SMALL_NUMBER) //LastMoveDirectionÀÌ 0ÀÌ ¾Æ´Ï¶ó¸é
+		if (LastMoveDirection.SizeSquared() > KINDA_SMALL_NUMBER) //LastMoveDirectionì´ 0ì´ ì•„ë‹ˆë¼ë©´
 		{
 			if (!bIsAttacking && CurrentMoveVector.X > 0.0f)
 			{
@@ -114,18 +77,18 @@
 
 		if (!FMath::IsNearlyZero(MoveVector.X))
 		{
-			// ¾Õ/µÚ ÀÌµ¿
+			// ì•ž/ë’¤ ì´ë™
 			LastMoveDirection = (CamForward * MoveVector.X + CamRight * MoveVector.Y).GetSafeNormal();
 			AddMovementInput(LastMoveDirection);
 
 			if (MoveVector.X > 0.f)
 			{
-				// ¾ÕÀ¸·Î ÀÌµ¿ÇÒ ¶§¸¸ Ä³¸¯ÅÍ È¸Àü
+				// ì•žìœ¼ë¡œ ì´ë™í•  ë•Œë§Œ ìºë¦­í„° íšŒì „
 				RotateTowardMovement(LastMoveDirection, GetWorld()->GetDeltaSeconds());
 			}
 			else if (!FMath::IsNearlyZero(MoveVector.Y))
 			{
-				// µÚ·Î ÀÌµ¿ Áß ÁÂ/¿ì ÀÔ·Â ¡æ ÀÌµ¿ ¾øÀÌ Ä«¸Þ¶ó È¸Àü
+				// ë’¤ë¡œ ì´ë™ ì¤‘ ì¢Œ/ìš° ìž…ë ¥ â†’ ì´ë™ ì—†ì´ ì¹´ë©”ë¼ íšŒì „
 				float YawDelta = MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
 				FRotator NewRotation = GetActorRotation();
 				NewRotation.Yaw += YawDelta;
@@ -134,7 +97,7 @@
 		}
 		else if (!FMath::IsNearlyZero(MoveVector.Y))
 		{
-			// ÁÂ/¿ì ÀÔ·Â¸¸ ¡æ ÀÌµ¿ ¾øÀÌ Ä³¸¯ÅÍ È¸Àü
+			// ì¢Œ/ìš° ìž…ë ¥ë§Œ â†’ ì´ë™ ì—†ì´ ìºë¦­í„° íšŒì „
 			float YawDelta = MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
 			FRotator NewRotation = GetActorRotation();
 			NewRotation.Yaw += YawDelta;

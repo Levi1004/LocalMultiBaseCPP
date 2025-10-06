@@ -73,17 +73,17 @@ void ALMBpawnBase::ApplyMeshByPlayerIndex()
     {
     case 0: // 1P
         MeshPath = TEXT("/Game/Assets/Male/Dwarf_Idle.Dwarf_Idle");
-        MeshLocation = FVector(0.f, 0.f, 0.f);
+        MeshLocation = FVector(0.f, 0.f, -20.f);
         MeshRotation = FRotator(0.f, -90.f, 0.f);
         MeshScale = FVector(1.0f);
-        PawnWorldLocation = FVector(3000.f, 3000.f, 0.f);  // 월드 위치 설정
+        PawnWorldLocation = FVector(3000.f, 3000.f, 20.f);  // 월드 위치 설정
         break;
 
     case 1: // 2P
         MeshPath = TEXT("/Game/Assets/Female/Standing_Idle.Standing_Idle");
         MeshLocation = FVector(0.f, 0.f, 0.f);
         MeshRotation = FRotator(0.f, -90.f, 0.f);
-        MeshScale = FVector(0.7f);
+        MeshScale = FVector(0.6f);
         PawnWorldLocation = FVector(3200.f, -3200.f, 150.f);  // 2P 시작 위치
         break;
 

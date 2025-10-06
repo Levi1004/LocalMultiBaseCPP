@@ -102,7 +102,6 @@ ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(
 	
 	NewPawn->SetPlayerIndex(CurrentPlayerIndex);
 	
-	NewPawn->AttachWeaponByPlayerIndex();
 
 	//플레이어 index 즉 플레이어 번호에 따라서 개별 스탯을 적용해준다.
 	if (CurrentPlayerIndex == 1)
