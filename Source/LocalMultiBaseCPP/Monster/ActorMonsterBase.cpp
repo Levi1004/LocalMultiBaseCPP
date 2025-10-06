@@ -22,7 +22,7 @@ AActorMonsterBase::AActorMonsterBase()
 	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("My Skeletal Mesh"));
 	SkeletalMeshComp->SetupAttachment(BoxComp);
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT(" / Game / Assets / Goblin / Goblin.Goblin"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT("/Game/Assets/Gobelin/Gobelin.Gobelin"));
 	if (MeshAsset.Succeeded())
 	{
 		SkeletalMeshComp->SetSkeletalMesh(MeshAsset.Object);
@@ -35,11 +35,6 @@ AActorMonsterBase::AActorMonsterBase()
 	{
 		UE_LOG(LogTemp, Error, TEXT("SetSkeletalMesh 가져오지 못했습니다."));
 	}
-	/*static ConstructorHelpers::FObjectFinder<UMaterial> MatAsset(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
-	if (MatAsset.Succeeded())
-	{
-		SkeletalMeshComp->SetMaterial(0, MatAsset.Object);
-	}*/
 }
 
 // Called when the game starts or when spawned

@@ -81,10 +81,10 @@ void ALMBpawnBase::ApplyMeshByPlayerIndex()
 
     case 1: // 2P
         MeshPath = TEXT("/Game/Assets/Female/Standing_Idle.Standing_Idle");
-        MeshLocation = FVector(0.f, 0.f, 0.f);
+        MeshLocation = FVector(0.f, 0.f, -30.f);
         MeshRotation = FRotator(0.f, -90.f, 0.f);
         MeshScale = FVector(0.6f);
-        PawnWorldLocation = FVector(3200.f, -3200.f, 150.f);  // 2P 시작 위치
+        PawnWorldLocation = FVector(3200.f, -3200.f, 30.f);  // 2P 시작 위치
         break;
 
     default:

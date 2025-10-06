@@ -29,23 +29,62 @@
 		cameraComp->SetupAttachment(springArmComp);
 		cameraComp->bUsePawnControlRotation = false;
 	}
-	
+	void ALMBpawnPlayer::BeginPlay()
+	{
+		Super::BeginPlay();
+
+		if (!LMBAnim && MeshComponent)
+		{
+			LMBAnim = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance());
+			if (LMBAnim)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Player %d AnimInstance 가져오기 성공 (BeginPlay)"), PlayerIndex);
+			}
+		}
+	}
 	
 	void ALMBpawnPlayer::PossessedBy(AController* NewController)
 	{
 		Super::PossessedBy(NewController);
-		ULMBAnimInstance* AnimInstance = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance());
-		LMBAnim = AnimInstance;
-	
+		
+		if (MeshComponent)
+		{
+			TSubclassOf<UAnimInstance> AnimClass = nullptr;
+
+			switch (PlayerIndex)
+			{
+			case 0:
+				AnimClass = LoadClass<UAnimInstance>(nullptr, TEXT("/Game/Assets/Male/BluePrint/Male_player.Male_player_C"));
+				break;
+
+			case 1:
+				AnimClass = LoadClass<UAnimInstance>(nullptr, TEXT("/Game/Assets/Female/BluePrint/female_Player.female_Player_C"));
+				break;
+
+			default:
+				UE_LOG(LogTemp, Warning, TEXT("PlayerIndex에 맞는 AnimClass 없음"));
+				break;
+			}
+
+			if (AnimClass)
+			{
+				MeshComponent->SetAnimInstanceClass(AnimClass);
+			}
+
+			// AnimInstance는 Tick이나 BeginPlay에서 가져오자
+			// LMBAnim = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance()); <-- 여기서는 아직 nullptr 가능
+		}
+
+		// PlayerController 연결
 		if (APlayerController* PC = Cast<APlayerController>(NewController))
 		{
 			PC->SetViewTarget(this);
 		}
 
-		APlayerController* FirstPlayerController = GetWorld()->GetFirstPlayerController();
-		ALMBPlayerController* LMBPlayerController = Cast<ALMBPlayerController>(FirstPlayerController);
-
-		LMBPlayerController->AddPawnPlayer(this);
+		if (ALMBPlayerController* LMBPlayerController = Cast<ALMBPlayerController>(GetWorld()->GetFirstPlayerController()))
+		{
+			LMBPlayerController->AddPawnPlayer(this);
+		}
 	}
 	
 	void ALMBpawnPlayer::Tick(float DeltaTime)
@@ -57,10 +96,7 @@
 			if (!bIsAttacking && CurrentMoveVector.X > 0.0f)
 			{
 				RotateTowardMovement(LastMoveDirection, DeltaTime);
-			}
-			
-				
-			
+			}	
 		}
 	}
 
