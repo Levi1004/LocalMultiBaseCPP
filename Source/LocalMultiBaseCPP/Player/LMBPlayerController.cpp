@@ -30,18 +30,32 @@ ALMBPlayerController::ALMBPlayerController()
 	{
 		IA_Move2P = Move2PObj.Object;
 	}
+	//  1P 스킬 (U, I, J, K)
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill1P_1Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill1P_1.IA_Skill1P_1"));
+	if (Skill1P_1Obj.Succeeded()) IA_Skill1P_1 = Skill1P_1Obj.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> Attack1PObj(TEXT("/Game/LMBCPP/Inputs/IA_Attack1P.IA_Attack1P"));
-	if (Attack1PObj.Succeeded())
-	{
-		IA_Attack1P = Attack1PObj.Object;
-	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill1P_2Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill1P_2.IA_Skill1P_2"));
+	if (Skill1P_2Obj.Succeeded()) IA_Skill1P_2 = Skill1P_2Obj.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> Attack2PObj(TEXT("/Game/LMBCPP/Inputs/IA_Attack2P.IA_Attack2P"));
-	if (Attack2PObj.Succeeded())
-	{
-		IA_Attack2P = Attack2PObj.Object;
-	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill1P_3Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill1P_3.IA_Skill1P_3"));
+	if (Skill1P_3Obj.Succeeded()) IA_Skill1P_3 = Skill1P_3Obj.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill1P_4Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill1P_4.IA_Skill1P_4"));
+	if (Skill1P_4Obj.Succeeded()) IA_Skill1P_4 = Skill1P_4Obj.Object;
+
+	//  2P 스킬 (Numpad 4, 5, 1, 2)
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill2P_1Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill2P_1.IA_Skill2P_1"));
+	if (Skill2P_1Obj.Succeeded()) IA_Skill2P_1 = Skill2P_1Obj.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill2P_2Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill2P_2.IA_Skill2P_2"));
+	if (Skill2P_2Obj.Succeeded()) IA_Skill2P_2 = Skill2P_2Obj.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill2P_3Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill2P_3.IA_Skill2P_3"));
+	if (Skill2P_3Obj.Succeeded()) IA_Skill2P_3 = Skill2P_3Obj.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill2P_4Obj(TEXT("/Game/LMBCPP/Inputs/IA_Skill2P_4.IA_Skill2P_4"));
+	if (Skill2P_4Obj.Succeeded()) IA_Skill2P_4 = Skill2P_4Obj.Object;
+	
 }
 
 void ALMBPlayerController::BeginPlay()
@@ -78,16 +92,18 @@ void ALMBPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnInputMove2P);
 		EnhancedInputComponent->BindAction(IA_Move2P, ETriggerEvent::Completed, this, &ALMBPlayerController::OnInputMove2P);
 	}
-	if (IA_Attack1P)
-	{
-		EnhancedInputComponent->BindAction(IA_Attack1P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnAttack1P);
-		
-	}
-	if (IA_Attack2P)
-	{
-		EnhancedInputComponent->BindAction(IA_Attack2P, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnAttack2P);
-		
-	}
+	//  1P 스킬 입력 바인딩 (U, I, J, K)
+	if (IA_Skill1P_1) EnhancedInputComponent->BindAction(IA_Skill1P_1, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_1);
+	if (IA_Skill1P_2) EnhancedInputComponent->BindAction(IA_Skill1P_2, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_2);
+	if (IA_Skill1P_3) EnhancedInputComponent->BindAction(IA_Skill1P_3, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_3);
+	if (IA_Skill1P_4) EnhancedInputComponent->BindAction(IA_Skill1P_4, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_4);
+
+	//  2P 스킬 입력 바인딩 (Numpad 4, 5, 1, 2)
+	if (IA_Skill2P_1) EnhancedInputComponent->BindAction(IA_Skill2P_1, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_1);
+	if (IA_Skill2P_2) EnhancedInputComponent->BindAction(IA_Skill2P_2, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_2);
+	if (IA_Skill2P_3) EnhancedInputComponent->BindAction(IA_Skill2P_3, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_3);
+	if (IA_Skill2P_4) EnhancedInputComponent->BindAction(IA_Skill2P_4, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_4);
+
 }
 
 void ALMBPlayerController::AddPawnPlayer(ALMBpawnPlayer* NewPlayer)
@@ -115,12 +131,14 @@ void ALMBPlayerController::OnInputMove2P(const FInputActionValue& Value)
 	PawnPlayers[1]->OnInputMove(Value.Get<FVector2D>());
 }
 
-void ALMBPlayerController::OnAttack1P()
-{
-	PawnPlayers[0]->StartAttack();
-}
+//  1P 스킬
+void ALMBPlayerController::OnSkill1P_1() { if (PawnPlayers.IsValidIndex(0)) PawnPlayers[0]->UseSkill(1); }
+void ALMBPlayerController::OnSkill1P_2() { if (PawnPlayers.IsValidIndex(0)) PawnPlayers[0]->UseSkill(2); }
+void ALMBPlayerController::OnSkill1P_3() { if (PawnPlayers.IsValidIndex(0)) PawnPlayers[0]->UseSkill(3); }
+void ALMBPlayerController::OnSkill1P_4() { if (PawnPlayers.IsValidIndex(0)) PawnPlayers[0]->UseSkill(4); }
 
-void ALMBPlayerController::OnAttack2P()
-{
-	PawnPlayers[1]->StartAttack();
-}
+//  2P 스킬
+void ALMBPlayerController::OnSkill2P_1() { if (PawnPlayers.IsValidIndex(1)) PawnPlayers[1]->UseSkill(1); }
+void ALMBPlayerController::OnSkill2P_2() { if (PawnPlayers.IsValidIndex(1)) PawnPlayers[1]->UseSkill(2); }
+void ALMBPlayerController::OnSkill2P_3() { if (PawnPlayers.IsValidIndex(1)) PawnPlayers[1]->UseSkill(3); }
+void ALMBPlayerController::OnSkill2P_4() { if (PawnPlayers.IsValidIndex(1)) PawnPlayers[1]->UseSkill(4); }

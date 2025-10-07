@@ -33,7 +33,7 @@ public:
 	
 protected:
 
-
+	// 1P 스킬 키 (U, I, J, K)
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class UInputMappingContext* IMC_LMBPlayerInput;
 
@@ -44,14 +44,35 @@ protected:
 	class UInputAction* IA_Move2P;
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
-	class UInputAction* IA_Attack1P;
-
+	UInputAction* IA_Skill1P_1;
 	UPROPERTY(VisibleAnywhere, Category = "Input")
-	class UInputAction* IA_Attack2P;
+	UInputAction* IA_Skill1P_2;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* IA_Skill1P_3;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* IA_Skill1P_4;
+
+	//  2P 스킬 (Numpad 4, 5, 1, 2)
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* IA_Skill2P_1;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* IA_Skill2P_2;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* IA_Skill2P_3;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* IA_Skill2P_4;
 
 private:
 	void OnInputMove1P(const struct FInputActionValue& Value);
 	void OnInputMove2P(const struct FInputActionValue& Value);
-	void OnAttack1P();
-	void OnAttack2P();
+
+	void OnSkill1P_1();
+	void OnSkill1P_2();
+	void OnSkill1P_3();
+	void OnSkill1P_4();
+
+	void OnSkill2P_1();
+	void OnSkill2P_2();
+	void OnSkill2P_3();
+	void OnSkill2P_4();
 };

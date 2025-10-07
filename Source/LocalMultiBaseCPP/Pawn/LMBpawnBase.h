@@ -28,7 +28,7 @@ protected:
 	class UFloatingPawnMovement* PawnMovement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float MaxSpeed = 500.0f;
+	float MaxSpeed = 300.0f;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerName")

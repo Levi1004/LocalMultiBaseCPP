@@ -32,15 +32,6 @@
 	void ALMBpawnPlayer::BeginPlay()
 	{
 		Super::BeginPlay();
-
-		if (!LMBAnim && MeshComponent)
-		{
-			LMBAnim = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance());
-			if (LMBAnim)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Player %d AnimInstance 가져오기 성공 (BeginPlay)"), PlayerIndex);
-			}
-		}
 	}
 	
 	void ALMBpawnPlayer::PossessedBy(AController* NewController)
@@ -69,6 +60,25 @@
 			if (AnimClass)
 			{
 				MeshComponent->SetAnimInstanceClass(AnimClass);
+
+				// AnimInstance가 생성된 직후 가져오기
+				LMBAnim = Cast<ULMBAnimInstance>(MeshComponent->GetAnimInstance());
+				if (LMBAnim)
+				{
+					// 1P 스킬
+					LMBAnim->SetSkillMontage(1, 1, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Male/anime/1P_Skill_1.1P_Skill_1")));
+					LMBAnim->SetSkillMontage(1, 2, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Male/anime/1P_Skill_2.1P_Skill_2")));
+					LMBAnim->SetSkillMontage(1, 3, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Male/anime/1P_Skill_3.1P_Skill_3")));
+					LMBAnim->SetSkillMontage(1, 4, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Male/anime/1P_Skill_4.1P_Skill_4")));
+
+					// 2P 스킬
+					LMBAnim->SetSkillMontage(2, 1, LoadObject<UAnimMontage>(nullptr, TEXT("")));
+					LMBAnim->SetSkillMontage(2, 2, LoadObject<UAnimMontage>(nullptr, TEXT("")));
+					LMBAnim->SetSkillMontage(2, 3, LoadObject<UAnimMontage>(nullptr, TEXT("")));
+					LMBAnim->SetSkillMontage(2, 4, LoadObject<UAnimMontage>(nullptr, TEXT("")));
+
+					UE_LOG(LogTemp, Warning, TEXT("모든 스킬 몽타주 Setter로 할당 완료 (PossessedBy)"));
+				}
 			}
 
 			// AnimInstance는 Tick이나 BeginPlay에서 가져오자
@@ -91,12 +101,9 @@
 	{
 		Super::Tick(DeltaTime);
 
-		if (LastMoveDirection.SizeSquared() > KINDA_SMALL_NUMBER) //LastMoveDirection이 0이 아니라면
+		if (LastMoveDirection.SizeSquared() > KINDA_SMALL_NUMBER)
 		{
-			if (!bIsAttacking && CurrentMoveVector.X > 0.0f)
-			{
-				RotateTowardMovement(LastMoveDirection, DeltaTime);
-			}	
+			RotateTowardMovement(LastMoveDirection, DeltaTime);
 		}
 	}
 
@@ -145,7 +152,7 @@
 
 	void ALMBpawnPlayer::RotateTowardMovement(const FVector& MoveDir, float DeltaTime)
 	{
-		if (bIsAttacking || MoveDir.IsNearlyZero())
+		if (MoveDir.IsNearlyZero())
 			return;
 
 		FRotator TargetRot = MoveDir.Rotation();
@@ -156,27 +163,28 @@
 		SetActorRotation(NewRot);
 	}
 
-	void ALMBpawnPlayer::StartAttack()
+	void ALMBpawnPlayer::UseSkill(int32 SkillIndex)
 	{
-		
-			if (bIsAttacking)
-				return;
+		UE_LOG(LogTemp, Warning, TEXT("%s : 스킬 %d 발동"), *GetName(), SkillIndex);
 
-		bIsAttacking = true;
-		if (PawnMovement)
-		{
-			PawnMovement->StopMovementImmediately();
-			PawnMovement->Deactivate();
-		}
 		if (LMBAnim)
-			LMBAnim->PlayAttackMontage();
+		{
+			// PlayerIndex는 0/1이므로 AnimInstance에서 1/2로 맞춰서 호출
+			LMBAnim->PlaySkillMontage(PlayerIndex + 1, SkillIndex);
+		}
 	}
 
 	void ALMBpawnPlayer::EndAttack()
 	{
-		bIsAttacking = false;
-            if (PawnMovement)
-			PawnMovement->Activate();
-	}
+		// 공격 상태 해제
+		UE_LOG(LogTemp, Warning, TEXT("%s : 스킬/공격 종료"), *GetName());
 
+		// 필요하다면 이동 가능 상태로 복구
+		if (MeshComponent)
+		{
+			// 예: 공격 중 이동 제한을 풀고 싶다면 여기서 처리
+		}
+
+		// 다른 상태 초기화도 가능
+	}
 

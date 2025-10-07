@@ -10,17 +10,7 @@
 
 ULMBAnimInstance::ULMBAnimInstance()
 {
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> AMObj(TEXT("/Game/LMBCPP/Animation/AM_AttackMontage.AM_AttackMontage"));
-	if (AMObj.Succeeded())
-	{
-		AttackMontage = AMObj.Object;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("AttackMontage를 가져오지 못했습니다."));
-	}
-
-	MovingThreshould = 3.0f;
+     MovingThreshould = 3.0f;
 }
 
 void ULMBAnimInstance::NativeInitializeAnimation()
@@ -35,7 +25,7 @@ void ULMBAnimInstance::NativeInitializeAnimation()
 		Movement = OwningActor->GetMovement();
 	}
 
-	AttackEndDelegate.BindUObject(this, &ULMBAnimInstance::AttackEnded);
+	SkillEndDelegate.BindUObject(this, &ULMBAnimInstance::SkillEnded);
 }
 
 void ULMBAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -54,20 +44,81 @@ void ULMBAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 }
 
-void ULMBAnimInstance::AttackEnded(UAnimMontage* AnimMontage, bool BInterrupted)
+
+void ULMBAnimInstance::SetSkillMontage(int32 PlayerIndex, int32 SkillIndex, UAnimMontage* Montage)
 {
-	Owner->EndAttack();
+	if (!Montage) return;
+
+	if (PlayerIndex == 1)
+	{
+		switch (SkillIndex)
+		{
+		case 1: Skill1P_1 = Montage; break;
+		case 2: Skill1P_2 = Montage; break;
+		case 3: Skill1P_3 = Montage; break;
+		case 4: Skill1P_4 = Montage; break;
+		default: break;
+		}
+	}
+	else if (PlayerIndex == 2)
+	{
+		switch (SkillIndex)
+		{
+		case 1: Skill2P_1 = Montage; break;
+		case 2: Skill2P_2 = Montage; break;
+		case 3: Skill2P_3 = Montage; break;
+		case 4: Skill2P_4 = Montage; break;
+		default: break;
+		}
+	}
 }
 
-void ULMBAnimInstance::PlayAttackMontage()
+void ULMBAnimInstance::PlaySkillMontage(int32 PlayerIndex, int32 SkillIndex)
 {
-	if (AttackMontage)
+	if (!Owner) return;
+
+	UAnimMontage* MontageToPlay = nullptr;
+
+	// PlayerIndex 1/2에 따라 몽타주 선택
+	if (PlayerIndex == 1)
 	{
-		float PlayedLen = Montage_Play(AttackMontage, 1.0f);
-		if (PlayedLen > 0.0f)
+		switch (SkillIndex)
 		{
-			//Montage_SetEndDelegate a
-			Montage_SetEndDelegate(AttackEndDelegate, AttackMontage);
+		case 1: MontageToPlay = Skill1P_1; break;
+		case 2: MontageToPlay = Skill1P_2; break;
+		case 3: MontageToPlay = Skill1P_3; break;
+		case 4: MontageToPlay = Skill1P_4; break;
+		default: break;
 		}
+	}
+	else if (PlayerIndex == 2)
+	{
+		switch (SkillIndex)
+		{
+		case 1: MontageToPlay = Skill2P_1; break;
+		case 2: MontageToPlay = Skill2P_2; break;
+		case 3: MontageToPlay = Skill2P_3; break;
+		case 4: MontageToPlay = Skill2P_4; break;
+		default: break;
+		}
+	}
+
+	if (MontageToPlay)
+	{
+		Montage_Play(MontageToPlay);
+		Montage_SetEndDelegate(SkillEndDelegate, MontageToPlay);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlaySkillMontage: 해당 스킬 몽타주가 없습니다! PlayerIndex=%d, SkillIndex=%d"), PlayerIndex, SkillIndex);
+	}
+}
+
+void ULMBAnimInstance::SkillEnded(UAnimMontage* AnimMontage, bool bInterrupted)
+{
+	if (Owner)
+	{
+		Owner->EndAttack(); // 스킬 종료 처리
+		UE_LOG(LogTemp, Warning, TEXT("Skill Montage Ended"));
 	}
 }

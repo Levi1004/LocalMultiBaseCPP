@@ -23,9 +23,7 @@ protected:
 	// tick 역할을 하는 함수
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
-private:
-	// Montage 애니메이션이 종료될 때 실행시킬 수 있는 델리게이트
-	FOnMontageEnded AttackEndDelegate;
+
 protected:
 	// TObjectptr : 꺽쇠 안에 들어온 타입과 그타입의 자식 포인터가 들어 올 수 있는 타입.
 	// 언리얼에서 지원하는 UObject용 포인터
@@ -52,11 +50,36 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	uint8 bIsIdle : 1;
 
+	// 1P 스킬 몽타주
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill1P_1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill1P_2;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill1P_3;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill1P_4;
+
+	// 2P 스킬 몽타주
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill2P_1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill2P_2;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill2P_3;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
+	UAnimMontage* Skill2P_4;
+
 protected:
+	FOnMontageEnded SkillEndDelegate;
+
+	// 스킬 몽타주 종료 시 호출되는 함수
 	UFUNCTION()
-	void AttackEnded(UAnimMontage* AnimMontage, bool BInterrupted);
+	void SkillEnded(UAnimMontage* AnimMontage, bool bInterrupted);
 
 public:
-	void PlayAttackMontage();
+	void SetSkillMontage(int32 PlayerIndex, int32 SkillIndex, UAnimMontage* Montage);
 
+	UFUNCTION(BlueprintCallable, Category = "Skill")
+	void PlaySkillMontage(int32 PlayerIndex, int32 SkillIndex);
 };

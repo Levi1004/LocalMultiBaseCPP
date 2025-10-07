@@ -36,12 +36,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float RoatationInterpSpeed = 2.0f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack")
-	uint8 bIsAttacking : 1;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<class ULMBAnimInstance> LMBAnim;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float CameraRotationSpeed = 100.f;
 
+private:
+	FVector2D CurrentMoveVector;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Player")
@@ -53,9 +55,10 @@ public:
 public:
 	void OnInputMove(const FVector2D& MoveVector);
 	void RotateTowardMovement(const FVector& MoveDir, float DeltaTime);
-	void StartAttack();
-	void EndAttack();
 	
+	UFUNCTION(BlueprintCallable, Category = "Skill")
+	void UseSkill(int32 SkillIndex);
+
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class USpringArmComponent* springArmComp;
@@ -63,14 +66,5 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* cameraComp;
 
-protected:
-
-	
-UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float CameraRotationSpeed = 100.f;
-
-private:
-	FVector2D CurrentMoveVector;
-
-
+	void EndAttack();
 };
