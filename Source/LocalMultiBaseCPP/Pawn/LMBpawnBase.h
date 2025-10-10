@@ -17,8 +17,6 @@ public:
 	// Sets default values for this pawn's properties
 	ALMBpawnBase();
 
-
-
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UBoxComponent* BoxComponent;
@@ -40,6 +38,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* CameraComp;
+
+	// ===== Animation =====
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	class ULMBAnimInstance* LMBAnim;
+
+	UPROPERTY()
+	TArray<TSubclassOf<UAnimInstance>> AnimClasses;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerName")
 	FString PlayerName = TEXT("Adventurer");
@@ -70,9 +76,18 @@ public:
 	void SetPlayerIndex(int32 NewIndex) { PlayerIndex = NewIndex; }
 	int32 GetPlayerIndex() const { return PlayerIndex; }
 
-	void ApplyMeshByPlayerIndex();
+	virtual void ApplyMeshByPlayerIndex();
+	
 	void OnInputMove(const FVector2D& MoveVector);
 	FORCEINLINE UFloatingPawnMovement* GetMovement() { return PawnMovement; };
+	
+	
+	UFUNCTION(BlueprintCallable, Category = "Skill")
+	virtual void UseSkill(int32 SkillIndex) { /* 기본 동작 없음 */ }
+		
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	virtual void EndAttack() { /* 기본 동작 없음 */ }
+private:
 	FVector2D CurrentMoveVector;
 
 };

@@ -31,12 +31,6 @@ ALMBpawnBase::ALMBpawnBase()
 	
 	//FClassFinder : 경로에있는 클래스를 가져온다.
 	// 클래스를 경로로 가져올땐 경로 뒤에 _C를 붙여줘야 한다.
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimClassRef(TEXT("/Game/LMBCPP/Animation/AB_LMBAnimainstans.AB_LMBAnimainstans_C"));
-	if (AnimClassRef.Succeeded())
-	{
-		MeshComponent->SetAnimInstanceClass(AnimClassRef.Class);
-	}
-
 	
     // ===== 이동 관련 =====
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("PawnMovement"));
@@ -59,7 +53,7 @@ ALMBpawnBase::ALMBpawnBase()
 
 
 	CurrentHealth = MaxHealth;
-	UE_LOG(LogTemp, Warning, TEXT("플레이어 0의 현재 체력 %f"), CurrentHealth);
+	UE_LOG(LogTemp, Warning, TEXT("플레이어 0 현재 체력 %f"), CurrentHealth);
 	
 
 
@@ -68,8 +62,6 @@ void ALMBpawnBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// PlayerIndex가 이미 할당되어 있다고 가정
-	ApplyMeshByPlayerIndex();
 }
 
 // -----------------------------
@@ -101,59 +93,7 @@ void ALMBpawnBase::Tick(float DeltaTime)
 
     // 필요시 추가 로직 가능 (예: 공격 중 이동 제한 등)
 }
-
-
 void ALMBpawnBase::ApplyMeshByPlayerIndex()
 {
-    FString MeshPath;
-    FVector MeshLocation = FVector::ZeroVector;  // SkeletalMesh 상대 위치
-    FRotator MeshRotation = FRotator::ZeroRotator;
-    FVector MeshScale = FVector(1.f);
-
-    // 스폰 위치를 PlayerIndex별로 설정할 지역 변수
-    FVector PawnWorldLocation = FVector::ZeroVector;
-
-    switch (PlayerIndex)
-    {
-    case 0: // 1P
-        MeshPath = TEXT("/Game/Assets/Male/Dwarf_Idle.Dwarf_Idle");
-        MeshLocation = FVector(0.f, 0.f, -20.f);
-        MeshRotation = FRotator(0.f, -90.f, 0.f);
-        MeshScale = FVector(1.0f);
-        PawnWorldLocation = FVector(3000.f, 3000.f, 20.f);  // 월드 위치 설정
-        break;
-
-    case 1: // 2P
-        MeshPath = TEXT("/Game/Assets/Female/Standing_Idle.Standing_Idle");
-        MeshLocation = FVector(0.f, 0.f, -30.f);
-        MeshRotation = FRotator(0.f, -90.f, 0.f);
-        MeshScale = FVector(0.6f);
-        PawnWorldLocation = FVector(3200.f, -3200.f, 30.f);  // 2P 시작 위치
-        break;
-
-    default:
-        UE_LOG(LogTemp, Warning, TEXT("PlayerIndex에 해당하는 메쉬가 없습니다."));
-        return;
-    }
-
-    // SkeletalMesh 적용
-    USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, *MeshPath);
-    if (NewMesh)
-    {
-        MeshComponent->SetSkeletalMesh(NewMesh);
-        MeshComponent->SetRelativeLocation(MeshLocation);
-        MeshComponent->SetRelativeRotation(MeshRotation);
-        MeshComponent->SetRelativeScale3D(MeshScale);
-
-        // Pawn 월드 위치 설정
-        SetActorLocation(PawnWorldLocation);
-
-        UE_LOG(LogTemp, Warning, TEXT("플레이어 %d 메쉬 적용 완료: %s"), PlayerIndex, *NewMesh->GetName());
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("플레이어 %d 메쉬를 불러오지 못했습니다: %s"), PlayerIndex, *MeshPath);
-    }
-
+    UE_LOG(LogTemp, Warning, TEXT("ALMBpawnBase::ApplyMeshByPlayerIndex() 호출"));
 }
-

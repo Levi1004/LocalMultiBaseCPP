@@ -14,31 +14,33 @@
 UCLASS()
 class LOCALMULTIBASECPP_API ALMBpawnPlayer : public ALMBpawnBase
 {
-	GENERATED_BODY()
-	
-public:
-	ALMBpawnPlayer();
-
-protected:
-	virtual void BeginPlay() override;
-	// Posses 될 때 나를 빙의 시키는 컨트롤러를 매개변수로 넣어주며 실행되는 함수
-	virtual void PossessedBy(AController* NewController)override;
-
-	virtual void Tick(float DeltaTime) override;
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	TObjectPtr<class ULMBAnimInstance> LMBAnim;
-	
+    GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	FORCEINLINE int32 GetPlayerIndex() const { return PlayerIndex; }
+    ALMBpawnPlayer();
 
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	FORCEINLINE void SetPlayerIndex(int32 NewIndex) { PlayerIndex = NewIndex; }
+protected:
+    virtual void BeginPlay() override;
+    virtual void PossessedBy(AController* NewController) override;
+    virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Skill")
-	void UseSkill(int32 SkillIndex);
+public:
+    /** PlayerIndex에 따라 Mesh/Anim 설정 */
+    virtual void ApplyMeshByPlayerIndex() override;
 
-    void EndAttack();
+    /** 스킬 발동 */
+    virtual void UseSkill(int32 SkillIndex) override;
+
+    /** 공격 종료 */
+    virtual void EndAttack() override;
+
+private:
+    /** AnimInstance 안전 초기화 체크 */
+    bool bAnimInitialized = false;
+
+    /** 플레이어별 스킬 몽타주 캐시 */
+    TMap<int32, UAnimMontage*> SkillMontages;
+
+    /** AnimInstance 생성/등록 */
+    void InitializeAnimInstance();
 };
