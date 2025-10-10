@@ -31,7 +31,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float MaxSpeed = 300.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float CameraRotationSpeed = 100.f;
 
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class UCameraComponent* CameraComp;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerName")
 	FString PlayerName = TEXT("Adventurer");
@@ -51,26 +59,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	int32 Level = 1;
 
-    FORCEINLINE class UFloatingPawnMovement* GetMovement() { return PawnMovement; };
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	int32 PlayerIndex = -1;
 
 public:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	void SetPlayerIndex(int32 NewIndex) { PlayerIndex = NewIndex; }
 	int32 GetPlayerIndex() const { return PlayerIndex; }
 
 	void ApplyMeshByPlayerIndex();
-protected:
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
-	int32 PlayerIndex = -1;
-
-public:
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	class USpringArmComponent* SpringArmComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	class UCameraComponent* CameraComp;
-
+	void OnInputMove(const FVector2D& MoveVector);
+	FORCEINLINE UFloatingPawnMovement* GetMovement() { return PawnMovement; };
+	FVector2D CurrentMoveVector;
 
 };

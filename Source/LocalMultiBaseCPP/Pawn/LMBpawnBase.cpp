@@ -72,8 +72,36 @@ void ALMBpawnBase::BeginPlay()
 	ApplyMeshByPlayerIndex();
 }
 
+// -----------------------------
+// Movement & Rotation Logic
+// -----------------------------
+void ALMBpawnBase::OnInputMove(const FVector2D& MoveVector)
+{
+    CurrentMoveVector = MoveVector;
 
-	
+    // ---- 좌/우 회전 ----
+    if (!FMath::IsNearlyZero(MoveVector.Y))
+    {
+        FRotator NewRot = GetActorRotation();
+        NewRot.Yaw += MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
+        SetActorRotation(NewRot);
+    }
+
+    // ---- 전/후 이동 ----
+    if (!FMath::IsNearlyZero(MoveVector.X))
+    {
+        FVector Forward = GetActorForwardVector();
+        AddMovementInput(Forward, MoveVector.X);
+    }
+}
+// Optional: Tick에서 회전 보간 적용 가능
+void ALMBpawnBase::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    // 필요시 추가 로직 가능 (예: 공격 중 이동 제한 등)
+}
+
 
 void ALMBpawnBase::ApplyMeshByPlayerIndex()
 {

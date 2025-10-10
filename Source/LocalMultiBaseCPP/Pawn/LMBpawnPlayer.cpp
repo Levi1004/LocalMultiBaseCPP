@@ -89,45 +89,6 @@
 	{
 		Super::Tick(DeltaTime);
 
-		if (LastMoveDirection.SizeSquared() > KINDA_SMALL_NUMBER)
-		{
-			RotateTowardMovement(LastMoveDirection, DeltaTime);
-		}
-
-	}
-
-	void ALMBpawnPlayer::OnInputMove(const FVector2D& MoveVector)
-	{
-		CurrentMoveVector = MoveVector;
-
-		// ---- 좌/우 회전 처리 ----
-		if (!FMath::IsNearlyZero(MoveVector.Y))
-		{
-			FRotator NewRot = GetActorRotation();
-			NewRot.Yaw += MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
-			SetActorRotation(NewRot);
-		}
-
-		// ---- 전/후 이동 처리 ----
-		if (!FMath::IsNearlyZero(MoveVector.X))
-		{
-			// 캐릭터가 바라보는 방향 기준으로 전/후진
-			FVector Forward = GetActorForwardVector();
-			AddMovementInput(Forward, MoveVector.X);
-		}
-	}
-
-	void ALMBpawnPlayer::RotateTowardMovement(const FVector& MoveDir, float DeltaTime)
-	{
-		if (MoveDir.IsNearlyZero())
-			return;
-
-		FRotator TargetRot = MoveDir.Rotation();
-		TargetRot.Pitch = 0.f;
-		TargetRot.Roll = 0.f;
-
-		FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, RoatationInterpSpeed);
-		SetActorRotation(NewRot);
 	}
 
 	void ALMBpawnPlayer::UseSkill(int32 SkillIndex)
