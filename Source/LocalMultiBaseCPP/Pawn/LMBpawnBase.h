@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 #include "LMBpawnBase.generated.h"
 
 UCLASS()
@@ -62,6 +64,13 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 PlayerIndex = -1;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class UCameraComponent* CameraComp;
 
 
 };

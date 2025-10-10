@@ -59,12 +59,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill")
 	void UseSkill(int32 SkillIndex);
 
-public:
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	class USpringArmComponent* springArmComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	class UCameraComponent* cameraComp;
-
-	void EndAttack();
+    void EndAttack();
 };

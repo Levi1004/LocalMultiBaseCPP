@@ -16,18 +16,6 @@
 
 		BoxComponent->SetCollisionProfileName(TEXT("PlayerProfile"));
 
-		springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
-		springArmComp->SetupAttachment(RootComponent);
-		springArmComp->SetUsingAbsoluteRotation(false);
-		springArmComp->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
-		springArmComp->TargetArmLength = 1000.0f;
-		springArmComp->bUsePawnControlRotation = false;
-		
-
-		
-		cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-		cameraComp->SetupAttachment(springArmComp);
-		cameraComp->bUsePawnControlRotation = false;
 	}
 	void ALMBpawnPlayer::BeginPlay()
 	{
@@ -105,49 +93,28 @@
 		{
 			RotateTowardMovement(LastMoveDirection, DeltaTime);
 		}
+
 	}
 
 	void ALMBpawnPlayer::OnInputMove(const FVector2D& MoveVector)
 	{
 		CurrentMoveVector = MoveVector;
 
-		FVector CamForward = cameraComp->GetForwardVector();
-		FVector CamRight = cameraComp->GetRightVector();
-		CamForward.Z = 0.f;
-		CamRight.Z = 0.f;
-		CamForward.Normalize();
-		CamRight.Normalize();
+		// ---- 좌/우 회전 처리 ----
+		if (!FMath::IsNearlyZero(MoveVector.Y))
+		{
+			FRotator NewRot = GetActorRotation();
+			NewRot.Yaw += MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
+			SetActorRotation(NewRot);
+		}
 
+		// ---- 전/후 이동 처리 ----
 		if (!FMath::IsNearlyZero(MoveVector.X))
 		{
-			// 앞/뒤 이동
-			LastMoveDirection = (CamForward * MoveVector.X + CamRight * MoveVector.Y).GetSafeNormal();
-			AddMovementInput(LastMoveDirection);
-
-			if (MoveVector.X > 0.f)
-			{
-				// 앞으로 이동할 때만 캐릭터 회전
-				RotateTowardMovement(LastMoveDirection, GetWorld()->GetDeltaSeconds());
-			}
-			else if (!FMath::IsNearlyZero(MoveVector.Y))
-			{
-				// 뒤로 이동 중 좌/우 입력 → 이동 없이 카메라 회전
-				float YawDelta = MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
-				FRotator NewRotation = GetActorRotation();
-				NewRotation.Yaw += YawDelta;
-				SetActorRotation(NewRotation);
-			}
+			// 캐릭터가 바라보는 방향 기준으로 전/후진
+			FVector Forward = GetActorForwardVector();
+			AddMovementInput(Forward, MoveVector.X);
 		}
-		else if (!FMath::IsNearlyZero(MoveVector.Y))
-		{
-			// 좌/우 입력만 → 이동 없이 캐릭터 회전
-			float YawDelta = MoveVector.Y * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
-			FRotator NewRotation = GetActorRotation();
-			NewRotation.Yaw += YawDelta;
-			SetActorRotation(NewRotation);
-		}
-
-		
 	}
 
 	void ALMBpawnPlayer::RotateTowardMovement(const FVector& MoveDir, float DeltaTime)

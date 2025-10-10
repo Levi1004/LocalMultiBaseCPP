@@ -14,6 +14,9 @@
 // Sets default values
 ALMBpawnBase::ALMBpawnBase()
 {
+
+    PrimaryActorTick.bCanEverTick = true;
+
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	SetRootComponent(BoxComponent);
 	BoxComponent->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
@@ -35,12 +38,25 @@ ALMBpawnBase::ALMBpawnBase()
 	}
 
 	
-
+    // ===== 이동 관련 =====
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("PawnMovement"));
 	PawnMovement->MaxSpeed = MaxSpeed; // 최대로 낼 수 있는 이동 속도
 	PawnMovement->Acceleration = 2048.0f; // 얼마나 빠르게 속도가 증가할 지
 	PawnMovement->Deceleration = 2000.0f; // 얼마나 빠르게 감속할 지 
 	PawnMovement->TurningBoost = 8.0f; // 회전을 얼마나 민첩하게할 지
+   
+    // ===== 카메라 관련 =====
+    SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+    SpringArmComp->SetupAttachment(RootComponent);
+    SpringArmComp->SetUsingAbsoluteRotation(false);
+    SpringArmComp->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
+    SpringArmComp->TargetArmLength = 1000.0f;
+    SpringArmComp->bUsePawnControlRotation = false;
+
+    CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+    CameraComp->SetupAttachment(SpringArmComp);
+    CameraComp->bUsePawnControlRotation = false;
+
 
 	CurrentHealth = MaxHealth;
 	UE_LOG(LogTemp, Warning, TEXT("플레이어 0의 현재 체력 %f"), CurrentHealth);
@@ -110,4 +126,6 @@ void ALMBpawnBase::ApplyMeshByPlayerIndex()
     {
         UE_LOG(LogTemp, Error, TEXT("플레이어 %d 메쉬를 불러오지 못했습니다: %s"), PlayerIndex, *MeshPath);
     }
+
 }
+
