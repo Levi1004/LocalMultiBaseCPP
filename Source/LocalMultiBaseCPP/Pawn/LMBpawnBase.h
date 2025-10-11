@@ -46,15 +46,16 @@ protected:
 	UPROPERTY()
 	TArray<TSubclassOf<UAnimInstance>> AnimClasses;
 
-public:
+protected:
+	//========================================================================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerName")
-	FString PlayerName = TEXT("Adventurer");
+	FString PlayerName = TEXT("Player");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MaxHealth = 200.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float CurrentHealth;
+	float CurrentHp = 200.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float AttackPower = 10.0f;
@@ -67,6 +68,20 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 PlayerIndex = -1;
+
+	// ===== Functions =====
+	virtual void Die();
+
+public:
+	virtual float TakeDamage(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator,
+		AActor* DamageCauser
+	) override;
+
+	FORCEINLINE float GetCurrentHp() const { return CurrentHp; }
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 
 public:
 	virtual void BeginPlay() override;

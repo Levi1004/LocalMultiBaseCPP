@@ -101,18 +101,8 @@ ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(
 	check(NewPawn);
 	
 	NewPawn->SetPlayerIndex(CurrentPlayerIndex);
-	
+	NewPawn->InitializePlayerStats(CurrentPlayerIndex); 
 
-	//플레이어 index 즉 플레이어 번호에 따라서 개별 스탯을 적용해준다.
-	if (CurrentPlayerIndex == 1)
-	{
-		NewPawn->MaxHealth = 100.0f;
-		NewPawn->AttackPower = 20.0f;
-		NewPawn->Defence = 0.0f;
-		NewPawn->Level = 1;
-		NewPawn->PlayerName = TEXT("Supporter");
-		NewPawn->CurrentHealth = NewPawn->MaxHealth;
-	}
 
 	// 플레이어 컨트롤러에 새로 생성한 Pawn을 빙의
 	PlayerController->Possess(NewPawn);

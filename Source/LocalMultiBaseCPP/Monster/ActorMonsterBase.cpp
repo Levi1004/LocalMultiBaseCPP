@@ -42,11 +42,13 @@ void AActorMonsterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    CurrentHp = Hp;
 	StartLocation = GetActorLocation();
 	bHasReachedDistance = false;
 	MovePhase = EMonsterMovePhase::InitialForward;
 
 	SetActorRotation(Direction.Rotation());
+
 }
 
 // Called every frame
@@ -126,6 +128,27 @@ void AActorMonsterBase::Tick(float DeltaTime)
         }
     }
 	
+}
+
+float AActorMonsterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    CurrentHp -= DamageAmount;
+
+    UE_LOG(LogTemp, Warning, TEXT("%s이(가) %f 데미지를 받음. 남은 HP: %f"), *GetName(), DamageAmount, CurrentHp);
+
+    if (CurrentHp <= 0.0f)
+    {
+        Die();
+    }
+
+    return DamageAmount;
+}
+
+void AActorMonsterBase::Die()
+{
+    UE_LOG(LogTemp, Warning, TEXT("%s 사망"), *GetName());
+    Destroy();
 }
 
 

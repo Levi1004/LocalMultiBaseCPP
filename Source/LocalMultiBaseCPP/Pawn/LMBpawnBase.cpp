@@ -52,8 +52,10 @@ ALMBpawnBase::ALMBpawnBase()
     CameraComp->bUsePawnControlRotation = false;
 
 
-	CurrentHealth = MaxHealth;
-	UE_LOG(LogTemp, Warning, TEXT("플레이어 0 현재 체력 %f"), CurrentHealth);
+
+
+	CurrentHp = MaxHealth;
+	UE_LOG(LogTemp, Warning, TEXT("플레이어 0 현재 체력 %f"), CurrentHp);
 	
 
 
@@ -93,7 +95,34 @@ void ALMBpawnBase::Tick(float DeltaTime)
 
     // 필요시 추가 로직 가능 (예: 공격 중 이동 제한 등)
 }
+
+float ALMBpawnBase::TakeDamage(
+	float DamageAmount,
+	const FDamageEvent& DamageEvent,
+	AController* EventInstigator,
+	AActor* DamageCauser
+)
+{
+	// 방어력 적용
+	float ActualDamage = FMath::Max(DamageAmount - Defence, 0.f);
+	CurrentHp -= ActualDamage;
+
+	UE_LOG(LogTemp, Warning, TEXT("%s took %f damage. Remaining HP: %f"), *GetName(), ActualDamage, CurrentHp);
+
+	if (CurrentHp <= 0.f)
+	{
+		Die();
+	}
+
+	return ActualDamage;
+}
+
+void ALMBpawnBase::Die()
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s has died"), *GetName());
+	Destroy();
+}
 void ALMBpawnBase::ApplyMeshByPlayerIndex()
 {
-    UE_LOG(LogTemp, Warning, TEXT("ALMBpawnBase::ApplyMeshByPlayerIndex() 호출"));
+	UE_LOG(LogTemp, Warning, TEXT("ALMBpawnBase::ApplyMeshByPlayerIndex() 호출"));
 }

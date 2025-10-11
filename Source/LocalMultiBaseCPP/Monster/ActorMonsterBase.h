@@ -38,14 +38,30 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 TraceRate = 25;
-	
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
-	int32 Hp = 50;
+	int32 Hp = 100;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster Stats")
+	float CurrentHp;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
-	int32 AttackPower = 3;
+	int32 AttackPower = 5;
 
 public:
 
+	// 데미지 처리
+	virtual float TakeDamage(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator,
+		AActor* DamageCauser
+	)override;
+	
+	void Die();
+	
+	
+	// 이동 관련 =====================================
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	FVector Direction = FVector(1, 0, 0);
 

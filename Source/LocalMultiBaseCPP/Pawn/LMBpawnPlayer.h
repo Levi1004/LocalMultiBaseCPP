@@ -14,33 +14,36 @@
 UCLASS()
 class LOCALMULTIBASECPP_API ALMBpawnPlayer : public ALMBpawnBase
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    ALMBpawnPlayer();
+	ALMBpawnPlayer();
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 protected:
-    virtual void BeginPlay() override;
-    virtual void PossessedBy(AController* NewController) override;
-    virtual void Tick(float DeltaTime) override;
+	UPROPERTY(BlueprintReadOnly)
+	bool bAnimInitialized = false;
+
+	// Skill Montages Map (PlayerIndex + SkillIndex)
+	UPROPERTY()
+	TMap<int32, class UAnimMontage*> SkillMontages;
 
 public:
-    /** PlayerIndex에 따라 Mesh/Anim 설정 */
-    virtual void ApplyMeshByPlayerIndex() override;
+	// PlayerIndex에 따라 스탯 초기화
+	void InitializePlayerStats(int32 InPlayerIndex);
 
-    /** 스킬 발동 */
-    virtual void UseSkill(int32 SkillIndex) override;
+	// PlayerIndex에 따라 Mesh/Anim 설정
+	virtual void ApplyMeshByPlayerIndex() override;
 
-    /** 공격 종료 */
-    virtual void EndAttack() override;
+	// 스킬 사용
+	virtual void UseSkill(int32 SkillIndex) override;
 
-private:
-    /** AnimInstance 안전 초기화 체크 */
-    bool bAnimInitialized = false;
+	// 공격 종료
+	virtual void EndAttack() override;
 
-    /** 플레이어별 스킬 몽타주 캐시 */
-    TMap<int32, UAnimMontage*> SkillMontages;
+	// Possess 처리
+	virtual void PossessedBy(AController* NewController) override;
 
-    /** AnimInstance 생성/등록 */
-    void InitializeAnimInstance();
 };
