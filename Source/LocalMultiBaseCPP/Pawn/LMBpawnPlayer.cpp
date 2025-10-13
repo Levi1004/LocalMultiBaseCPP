@@ -52,7 +52,19 @@ void ALMBpawnPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	ApplyMeshByPlayerIndex();
+
+	USkeletalMesh* SwordMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/Assets/Weapon/InfinityBladeWeapons/Weapons/Blade/Swords/Blade_HeroSword11/SK_Blade_HeroSword11.SK_Blade_HeroSword11"));
+	if (SwordMesh)
+	{
+		USkeletalMeshComponent* SwordComp = NewObject<USkeletalMeshComponent>(this);
+		SwordComp->SetSkeletalMesh(SwordMesh);
+		SwordComp->RegisterComponent(); // 반드시 컴포넌트 등록
+		SwordComp->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RightHandSocket"));
+
+		
+	}
 }
+
 
 void ALMBpawnPlayer::Tick(float DeltaTime)
 {
