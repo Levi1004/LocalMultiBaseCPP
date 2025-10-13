@@ -2,33 +2,48 @@
 
 
 #include "Attack/AttackComponent.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/Actor.h"
+#include "Pawn/LMBpawnPlayer.h"
+#include "Monster/ActorMonsterBase.h"
 
 // Sets default values for this component's properties
-UAttackComponent::UAttackComponent()
-{
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+ UAttackComponent::UAttackComponent()
+ {
+        PrimaryComponentTick.bCanEverTick = false;
+ }
 
-	// ...
-}
+ void UAttackComponent::PerformAttack(AActor * OwnerActor, float AttackRange)
+    {
+     if (!OwnerActor) return;
+
+     FVector Start = OwnerActor->GetActorLocation() + FVector(0, 0, 50); // 캐릭터 높이 보정
+     FVector End = Start + OwnerActor->GetActorForwardVector() * AttackRange;
+
+     FHitResult Hit;
+     FCollisionQueryParams Params;
+     Params.AddIgnoredActor(OwnerActor);
+
+     if (OwnerActor->GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+     {
+        if (AActorMonsterBase* HitMonster = Cast<AActorMonsterBase>(Hit.GetActor()))
+           {
+             // 공격력 가져오기
+              float Damage = 0.f;
+              if (ALMBpawnPlayer* Player = Cast<ALMBpawnPlayer>(OwnerActor))
+              {
+                    Damage = Player->AttackPower;
+              }
+
+                HitMonster->ApplyDamage(Damage);
+                UE_LOG(LogTemp, Warning, TEXT("%s hit %s for %f damage"), *OwnerActor->GetName(), *HitMonster->GetName(), Damage);
+        }
+     }
+
+        // 디버그 라인
+        DrawDebugLine(OwnerActor->GetWorld(), Start, End, FColor::Red, true, 10.f, 0, 10.f);
+        UE_LOG(LogTemp, Warning, TEXT("PerformAttack called! Start=%s End=%s"), *Start.ToString(), *End.ToString());
+    }
 
 
-// Called when the game starts
-void UAttackComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
-void UAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
 

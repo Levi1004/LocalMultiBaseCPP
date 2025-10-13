@@ -46,6 +46,7 @@ ALMBpawnBase::ALMBpawnBase()
     SpringArmComp->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
     SpringArmComp->TargetArmLength = 1000.0f;
     SpringArmComp->bUsePawnControlRotation = false;
+	SpringArmComp->bDoCollisionTest = false;
 
     CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
     CameraComp->SetupAttachment(SpringArmComp);

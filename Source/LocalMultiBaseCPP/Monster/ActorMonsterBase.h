@@ -49,15 +49,9 @@ protected:
 	int32 AttackPower = 5;
 
 public:
-
+	void ApplyDamage(float Damage);
 	// 데미지 처리
-	virtual float TakeDamage(
-		float DamageAmount,
-		struct FDamageEvent const& DamageEvent,
-		class AController* EventInstigator,
-		AActor* DamageCauser
-	)override;
-	
+
 	void Die();
 	
 	
@@ -80,12 +74,6 @@ public:
 	bool bHasReachedDistance = false;
 	
 	EMonsterMovePhase MovePhase = EMonsterMovePhase::InitialForward;
-
-
-
-
-
-
 
 
 };

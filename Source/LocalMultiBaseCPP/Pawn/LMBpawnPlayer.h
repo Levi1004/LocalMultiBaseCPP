@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Pawn/LMBpawnBase.h"
+#include "Attack/AttackComponent.h"
 #include "LMBpawnPlayer.generated.h"
 
 
@@ -46,4 +47,6 @@ public:
 	// Possess Ã³¸®
 	virtual void PossessedBy(AController* NewController) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack")
+	class UAttackComponent* AttackComp;
 };

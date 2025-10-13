@@ -130,19 +130,16 @@ void AActorMonsterBase::Tick(float DeltaTime)
 	
 }
 
-float AActorMonsterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AActorMonsterBase::ApplyDamage(float Damage)
 {
-    float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-    CurrentHp -= DamageAmount;
+    if (Damage <= 0.f) return;
+    CurrentHp -= Damage;
+    UE_LOG(LogTemp, Warning, TEXT("%s took %f damage. Remaining HP: %f"), *GetName(), Damage, CurrentHp);
 
-    UE_LOG(LogTemp, Warning, TEXT("%s이(가) %f 데미지를 받음. 남은 HP: %f"), *GetName(), DamageAmount, CurrentHp);
-
-    if (CurrentHp <= 0.0f)
+    if (CurrentHp <= 0.f)
     {
         Die();
     }
-
-    return DamageAmount;
 }
 
 void AActorMonsterBase::Die()

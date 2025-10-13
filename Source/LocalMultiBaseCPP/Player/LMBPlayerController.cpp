@@ -85,16 +85,16 @@ void ALMBPlayerController::SetupInputComponent()
 	}
 
 	// 1P 스킬 (U/I/J/K)
-	if (IA_Skill1P_U) EnhancedInputComponent->BindAction(IA_Skill1P_U, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_U);
-	if (IA_Skill1P_I) EnhancedInputComponent->BindAction(IA_Skill1P_I, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_I);
-	if (IA_Skill1P_J) EnhancedInputComponent->BindAction(IA_Skill1P_J, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_J);
-	if (IA_Skill1P_K) EnhancedInputComponent->BindAction(IA_Skill1P_K, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill1P_K);
+	if (IA_Skill1P_U) EnhancedInputComponent->BindAction(IA_Skill1P_U, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill1P_U);
+	if (IA_Skill1P_I) EnhancedInputComponent->BindAction(IA_Skill1P_I, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill1P_I);
+	if (IA_Skill1P_J) EnhancedInputComponent->BindAction(IA_Skill1P_J, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill1P_J);
+	if (IA_Skill1P_K) EnhancedInputComponent->BindAction(IA_Skill1P_K, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill1P_K);
 
 	// 2P 스킬 (NumPad 4/5/1/2)
-	if (IA_Skill2P_4) EnhancedInputComponent->BindAction(IA_Skill2P_4, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_4);
-	if (IA_Skill2P_5) EnhancedInputComponent->BindAction(IA_Skill2P_5, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_5);
-	if (IA_Skill2P_1) EnhancedInputComponent->BindAction(IA_Skill2P_1, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_1);
-	if (IA_Skill2P_2) EnhancedInputComponent->BindAction(IA_Skill2P_2, ETriggerEvent::Triggered, this, &ALMBPlayerController::OnSkill2P_2);
+	if (IA_Skill2P_4) EnhancedInputComponent->BindAction(IA_Skill2P_4, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill2P_4);
+	if (IA_Skill2P_5) EnhancedInputComponent->BindAction(IA_Skill2P_5, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill2P_5);
+	if (IA_Skill2P_1) EnhancedInputComponent->BindAction(IA_Skill2P_1, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill2P_1);
+	if (IA_Skill2P_2) EnhancedInputComponent->BindAction(IA_Skill2P_2, ETriggerEvent::Started, this, &ALMBPlayerController::OnSkill2P_2);
 }
 
 void ALMBPlayerController::AddPawnPlayer(ALMBpawnPlayer* NewPlayer)

@@ -13,6 +13,7 @@ ALMBpawnPlayer::ALMBpawnPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
 	// 콜리전 프로필
 	if (BoxComponent)
 	{
@@ -27,13 +28,13 @@ void ALMBpawnPlayer::InitializePlayerStats(int32 InPlayerIndex)
 	switch (PlayerIndex)
 	{
 	case 0: // 1P
-		PlayerName = TEXT("Warrior");
+		PlayerName = TEXT("Warrior1");
 		MaxHealth = 200.f;
 		AttackPower = 25.f;
 		Defence = 5.f;
 		break;
 	case 1: // 2P
-		PlayerName = TEXT("Supporter");
+		PlayerName = TEXT("Warrior2");
 		MaxHealth = 200.f;
 		AttackPower = 25.f;
 		Defence = 5.f;
@@ -142,6 +143,11 @@ void ALMBpawnPlayer::UseSkill(int32 SkillIndex)
 		LMBAnim->PlaySkillMontage(PlayerIndex + 1, SkillIndex);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s : 스킬 %d 발동"), *GetName(), SkillIndex);
+
+	if (AttackComp)
+	{
+		AttackComp->PerformAttack(this, 200.f); // 공격 거리 예시
+	}
 }
 
 void ALMBpawnPlayer::EndAttack()

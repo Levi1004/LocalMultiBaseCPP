@@ -46,7 +46,7 @@ protected:
 	UPROPERTY()
 	TArray<TSubclassOf<UAnimInstance>> AnimClasses;
 
-protected:
+public:
 	//========================================================================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerName")
 	FString PlayerName = TEXT("Player");
