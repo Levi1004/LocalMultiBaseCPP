@@ -34,9 +34,9 @@ void ALMBpawnPlayer::InitializePlayerStats(int32 InPlayerIndex)
 		break;
 	case 1: // 2P
 		PlayerName = TEXT("Supporter");
-		MaxHealth = 100.f;
-		AttackPower = 50.f;
-		Defence = 0.f;
+		MaxHealth = 200.f;
+		AttackPower = 25.f;
+		Defence = 5.f;
 		break;
 	default:
 		PlayerName = TEXT("Unknown");
@@ -66,10 +66,6 @@ void ALMBpawnPlayer::Tick(float DeltaTime)
 			LMBAnim = AnimInst;
 
 			// 스킬 몽타주 등록
-			for (auto& Pair : SkillMontages)
-			{
-				LMBAnim->SetSkillMontage(Pair.Key / 10, Pair.Key % 10, Pair.Value);
-			}
 
 			bAnimInitialized = true;
 			UE_LOG(LogTemp, Warning, TEXT("플레이어 %d AnimInstance 초기화 완료"), PlayerIndex);
@@ -94,28 +90,19 @@ void ALMBpawnPlayer::PossessedBy(AController* NewController)
 
 void ALMBpawnPlayer::ApplyMeshByPlayerIndex()
 {
-	FString MeshPath;
-	TSubclassOf<UAnimInstance> AnimClass = nullptr;
-	FVector MeshLocation = FVector::ZeroVector;
-	FRotator MeshRotation = FRotator::ZeroRotator;
+	FString MeshPath = TEXT("/Game/Assets/Male/Dwarf_Idle.Dwarf_Idle");
+	TSubclassOf<UAnimInstance> AnimClass = LoadClass<UAnimInstance>(nullptr, TEXT("/Game/Assets/Male/BluePrint/NewAnimBlueprint.NewAnimBlueprint_C"));
+	FVector MeshLocation = FVector(0.f, 0.f, -20.f);
+	FRotator MeshRotation = FRotator(0.f, -90.f, 0.f);
 	FVector MeshScale = FVector(1.f);
 	FVector SpawnLocation = FVector::ZeroVector;
 
 	switch (PlayerIndex)
 	{
 	case 0:
-		MeshPath = TEXT("/Game/Assets/Male/Dwarf_Idle.Dwarf_Idle");
-		AnimClass = LoadClass<UAnimInstance>(nullptr, TEXT("/Game/Assets/Male/BluePrint/Male_player.Male_player_C"));
-		MeshLocation = FVector(0.f, 0.f, -20.f);
-		MeshRotation = FRotator(0.f, -90.f, 0.f);
 		SpawnLocation = FVector(3000.f, 3000.f, 20.f);
 		break;
 	case 1:
-		MeshPath = TEXT("/Game/Assets/Female/Standing_Idle.Standing_Idle");
-		AnimClass = LoadClass<UAnimInstance>(nullptr, TEXT("/Game/Assets/Female/BluePrint/female_Player.female_Player_C"));
-		MeshLocation = FVector(0.f, 0.f, -30.f);
-		MeshRotation = FRotator(0.f, -90.f, 0.f);
-		MeshScale = FVector(0.6f);
 		SpawnLocation = FVector(3200.f, -3200.f, 30.f);
 		break;
 	default:
@@ -145,19 +132,7 @@ void ALMBpawnPlayer::ApplyMeshByPlayerIndex()
 	{
 		MeshComponent->SetAnimInstanceClass(AnimClass);
 	}
-
-	// 스킬 몽타주 미리 로드
-	SkillMontages.Empty();
-	if (PlayerIndex == 0)
-	{
-		SkillMontages.Add(11, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Male/anime/1P_Skill_1.1P_Skill_1")));
-		SkillMontages.Add(12, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Male/anime/1P_Skill_2.1P_Skill_2")));
-	}
-	else if (PlayerIndex == 1)
-	{
-		SkillMontages.Add(21, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Female/anime/2P_Skill_1.2P_Skill_1")));
-		SkillMontages.Add(22, LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Assets/Female/anime/2P_Skill_2.2P_Skill_2")));
-	}
+	
 }
 
 void ALMBpawnPlayer::UseSkill(int32 SkillIndex)

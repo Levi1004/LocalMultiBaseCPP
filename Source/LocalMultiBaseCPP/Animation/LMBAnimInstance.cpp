@@ -45,73 +45,26 @@ void ULMBAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 }
 
 
-void ULMBAnimInstance::SetSkillMontage(int32 PlayerIndex, int32 SkillIndex, UAnimMontage* Montage)
-{
-	if (!Montage) return;
-
-	if (PlayerIndex == 1)
-	{
-		switch (SkillIndex)
-		{
-		case 1: Skill1P_1 = Montage; break;
-		case 2: Skill1P_2 = Montage; break;
-		case 3: Skill1P_3 = Montage; break;
-		case 4: Skill1P_4 = Montage; break;
-		default: break;
-		}
-	}
-	else if (PlayerIndex == 2)
-	{
-		switch (SkillIndex)
-		{
-		case 1: Skill2P_1 = Montage; break;
-		case 2: Skill2P_2 = Montage; break;
-		case 3: Skill2P_3 = Montage; break;
-		case 4: Skill2P_4 = Montage; break;
-		default: break;
-		}
-	}
-}
-
 void ULMBAnimInstance::PlaySkillMontage(int32 PlayerIndex, int32 SkillIndex)
 {
-	if (!Owner) return;
-
-	UAnimMontage* MontageToPlay = nullptr;
-
-	// PlayerIndex 1/2에 따라 몽타주 선택
-	if (PlayerIndex == 1)
+	if (!SkillAllMontage)
 	{
-		switch (SkillIndex)
-		{
-		case 1: MontageToPlay = Skill1P_1; break;
-		case 2: MontageToPlay = Skill1P_2; break;
-		case 3: MontageToPlay = Skill1P_3; break;
-		case 4: MontageToPlay = Skill1P_4; break;
-		default: break;
-		}
-	}
-	else if (PlayerIndex == 2)
-	{
-		switch (SkillIndex)
-		{
-		case 1: MontageToPlay = Skill2P_1; break;
-		case 2: MontageToPlay = Skill2P_2; break;
-		case 3: MontageToPlay = Skill2P_3; break;
-		case 4: MontageToPlay = Skill2P_4; break;
-		default: break;
-		}
+		UE_LOG(LogTemp, Warning, TEXT("SkillAllMontage가 지정되지 않았습니다!"));
+		return;
 	}
 
-	if (MontageToPlay)
+	FName SectionName;
+	switch (SkillIndex)
 	{
-		Montage_Play(MontageToPlay);
-		Montage_SetEndDelegate(SkillEndDelegate, MontageToPlay);
+	case 1: SectionName = FName("Skill1"); break;
+	case 2: SectionName = FName("Skill2"); break;
+	case 3: SectionName = FName("Skill3"); break;
+	default: SectionName = FName("Attack"); break;
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlaySkillMontage: 해당 스킬 몽타주가 없습니다! PlayerIndex=%d, SkillIndex=%d"), PlayerIndex, SkillIndex);
-	}
+
+	Montage_Play(SkillAllMontage);
+	Montage_JumpToSection(SectionName, SkillAllMontage);
+	Montage_SetEndDelegate(SkillEndDelegate, SkillAllMontage);
 }
 
 void ULMBAnimInstance::SkillEnded(UAnimMontage* AnimMontage, bool bInterrupted)

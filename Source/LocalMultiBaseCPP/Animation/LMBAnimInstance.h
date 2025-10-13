@@ -50,25 +50,8 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	uint8 bIsIdle : 1;
 
-	// 1P 스킬 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill1P_1;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill1P_2;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill1P_3;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill1P_4;
-
-	// 2P 스킬 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill2P_1;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill2P_2;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill2P_3;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montage|Skill")
-	UAnimMontage* Skill2P_4;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+	UAnimMontage* SkillAllMontage;
 
 protected:
 	FOnMontageEnded SkillEndDelegate;
