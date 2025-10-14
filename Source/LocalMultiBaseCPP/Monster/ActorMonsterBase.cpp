@@ -4,6 +4,8 @@
 #include "Monster/ActorMonsterBase.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Pawn/LMBpawnPlayer.h"
 
 
 // Sets default values
@@ -54,81 +56,54 @@ void AActorMonsterBase::BeginPlay()
 // Called every frame
 void AActorMonsterBase::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-    if (MovePhase == EMonsterMovePhase::InitialForward && !bHasReachedDistance)
+    Super::Tick(DeltaTime);
+
+    // --- [1] 씬에 있는 모든 플레이어 가져오기 ---
+    TArray<AActor*> FoundPlayers;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALMBpawnPlayer::StaticClass(), FoundPlayers);
+    if (FoundPlayers.Num() == 0) return;
+
+    // --- [2] 가장 가까운 플레이어 탐색 ---
+    AActor* ClosestPlayer = nullptr;
+    float ClosestDistSq = FLT_MAX;
+    FVector MyLocation = GetActorLocation();
+
+    for (AActor* Player : FoundPlayers)
     {
-        // 전방 이동
-        FVector MoveDir = Direction.GetSafeNormal();
-        FVector NewLocation = GetActorLocation() + MoveDir * MoveSpeed * DeltaTime;
-        float Traveled = (NewLocation - StartLocation).Size();
-
-        if (Traveled >= MaxForwardDistance)
+        float DistSq = FVector::DistSquared(Player->GetActorLocation(), MyLocation);
+        if (DistSq < ClosestDistSq)
         {
-            SetActorLocation(StartLocation + MoveDir * MaxForwardDistance);
-            bHasReachedDistance = true;
-
-            // 자유 이동 단계로 전환
-            MovePhase = EMonsterMovePhase::FreeMovement;
-            StartLocation = GetActorLocation();
-            bHasFreeTarget = false;
-            FreeMoveWaitTime = 0.f;
-        }
-        else
-        {
-            SetActorLocation(NewLocation);
-        }
-
-        // 전방 이동 중에도 방향 회전
-        if (!MoveDir.IsNearlyZero())
-        {
-            FRotator TargetRot = MoveDir.Rotation();
-            SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, 5.f));
+            ClosestDistSq = DistSq;
+            ClosestPlayer = Player;
         }
     }
-    else if (MovePhase == EMonsterMovePhase::FreeMovement)
+
+    if (!ClosestPlayer) return;
+
+    // --- [3] 가장 가까운 플레이어 방향으로 이동 ---
+    FVector ToPlayer = (ClosestPlayer->GetActorLocation() - MyLocation);
+    ToPlayer.Z = 0; // Yaw 회전만 적용
+    FVector MoveDir = ToPlayer.GetSafeNormal();
+
+    if (!MoveDir.IsNearlyZero())
     {
-        if (!bHasFreeTarget)
-        {
-            // 새로운 목표 설정
-            FVector RandomOffset = FVector(
-                FMath::RandRange(-FreeMoveRange, FreeMoveRange),
-                FMath::RandRange(-FreeMoveRange, FreeMoveRange),
-                0.f
-            );
-            FreeMoveTarget = StartLocation + RandomOffset;
-            bHasFreeTarget = true;
-            FreeMoveWaitTime = 0.f;
-        }
+        // 회전 (부드럽게 플레이어를 향하도록)
+        FRotator TargetRot = MoveDir.Rotation();
+        SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, 3.f));
 
-        FVector CurrentLocation = GetActorLocation();
-        float DistToTarget = (FreeMoveTarget - CurrentLocation).Size();
-
-        if (DistToTarget < 10.f)
+        // 이동 (일정 거리 이상일 때만)
+        float DistToPlayer = ToPlayer.Size();
+        if (DistToPlayer > 150.f) // 너무 가까우면 멈춤
         {
-            // 목표 도달 → 대기
-            FreeMoveWaitTime += DeltaTime;
-            if (FreeMoveWaitTime >= 10.f)
-            {
-                bHasFreeTarget = false;
-                FreeMoveWaitTime = 0.f;
-            }
-        }
-        else
-        {
-            // 목표를 향해 부드럽게 이동
-            FVector MoveDir = (FreeMoveTarget - CurrentLocation).GetSafeNormal();
-            SetActorLocation(CurrentLocation + MoveDir * MoveSpeed / 2 * DeltaTime);
-
-            // 이동 방향으로 자연스럽게 회전
-            if (!MoveDir.IsNearlyZero())
-            {
-                FRotator TargetRot = MoveDir.Rotation();
-                SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, 5.f));
-            }
+            SetActorLocation(MyLocation + MoveDir * MoveSpeed * DeltaTime);
         }
     }
-	
+
+    // --- [4] 디버그 시각화 ---
+    DrawDebugLine(GetWorld(), MyLocation, ClosestPlayer->GetActorLocation(), FColor::Red, false, -1.f, 0, 2.f);
 }
+
+
 
 void AActorMonsterBase::ApplyDamage(float Damage)
 {

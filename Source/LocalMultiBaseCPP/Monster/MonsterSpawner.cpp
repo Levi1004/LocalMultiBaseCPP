@@ -50,6 +50,9 @@ void AMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentTime = 0.f;
+	TotalMonsterKilled = 0;
+	SpawnedMonsterHpMultiplier = 1.f;
+	SpawnedMonsterAttackMultiplier = 1.f;
 }
 
 
@@ -58,6 +61,15 @@ void AMonsterSpawner::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 	
+
+	for (int32 i = SpawnedMonsters.Num() - 1; i >= 0; --i)
+	{
+		if (!IsValid(SpawnedMonsters[i])) // 이미 Destroy된 경우
+		{
+			SpawnedMonsters.RemoveAt(i);
+		}
+	}
+
 	CurrentTime += DeltaTime;
 	if (CurrentTime >= DelayTime && SpawnedMonsters.Num() < MaxSpawnCount)
 	{
@@ -78,9 +90,34 @@ void AMonsterSpawner::Tick(float DeltaTime)
 				NewMonster->Direction = FVector(1, 0, 0); 
 				NewMonster->MovePhase = EMonsterMovePhase::InitialForward;
 				NewMonster->bHasReachedDistance = false;
+
+				NewMonster->Hp = FMath::RoundToInt(NewMonster->Hp * SpawnedMonsterHpMultiplier);
+				NewMonster->AttackPower = FMath::RoundToInt(NewMonster->AttackPower * SpawnedMonsterAttackMultiplier);
+
+
+				NewMonster->OnDestroyed.AddDynamic(this, &AMonsterSpawner::OnMonsterDestroyed);
 			}
 		}
 	}
 	
 }
+void AMonsterSpawner::OnMonsterDestroyed(AActor* DestroyedActor)
+{
+	AActorMonsterBase* DestroyedMonster = Cast<AActorMonsterBase>(DestroyedActor);
+	if (DestroyedMonster)
+	{
+		SpawnedMonsters.Remove(DestroyedMonster);
+		TotalMonsterKilled++;
 
+		UE_LOG(LogTemp, Warning, TEXT("몬스터 처치! 총 킬 수: %d"), TotalMonsterKilled);
+
+		// 100마리마다 스탯 증가
+		if (TotalMonsterKilled % 10 == 0)
+		{
+			SpawnedMonsterHpMultiplier += 0.2f;      // 예: HP 20% 증가
+			SpawnedMonsterAttackMultiplier += 0.1f;  // 공격력 10% 증가
+			UE_LOG(LogTemp, Warning, TEXT("몬스터 스탯 증가! HP x%.1f / Attack x%.1f"),
+				SpawnedMonsterHpMultiplier, SpawnedMonsterAttackMultiplier);
+		}
+	}
+}

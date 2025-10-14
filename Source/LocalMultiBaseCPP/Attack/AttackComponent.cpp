@@ -17,7 +17,7 @@
     {
      if (!OwnerActor) return;
 
-     FVector Start = OwnerActor->GetActorLocation() + FVector(0, 0, 50); // 캐릭터 높이 보정
+     FVector Start = OwnerActor->GetActorLocation() + FVector(0, 0, 100); // 캐릭터 높이 보정
      FVector End = Start + OwnerActor->GetActorForwardVector() * AttackRange;
 
      FHitResult Hit;

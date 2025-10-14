@@ -6,51 +6,60 @@
 #include "GameFramework/Actor.h"
 #include "MonsterSpawner.generated.h"
 
+class UBoxComponent;
+class UStaticMeshComponent;
 class AActorMonsterBase;
 
 UCLASS()
 class LOCALMULTIBASECPP_API AMonsterSpawner : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AMonsterSpawner();
+    GENERATED_BODY()
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-  
-
-protected:
-	UPROPERTY(EditAnywhere, Category = "DelayTime")
-	float DelayTime = 3.0f;
-	
-private:
-	float CurrentTime = 0.0f;
-	TArray<FVector> SpreadDirections;
-	TArray<AActorMonsterBase*> SpawnedMonsters;
 public:
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
+    // Sets default values for this actor's properties
+    AMonsterSpawner();
 
-	UPROPERTY(VisibleAnywhere)
-	class UStaticMeshComponent* MeshComp;
+protected:
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Spawner")
-	TSubclassOf<AActorMonsterBase> EnemyClass;
+public:
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, Category = "SpawnCount")
-	int32 MaxSpawnCount = 5;
+    // 몬스터 스폰 관련
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
+    TSubclassOf<AActorMonsterBase> EnemyClass;
 
-    UPROPERTY(EditAnywhere, Category = "Spawner")
-	TArray<FVector> SpreadOffsets;
-	
-	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
+    float DelayTime = 2.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
+    int32 MaxSpawnCount = 25;
+
+    // 몬스터 스폰 위치 오프셋
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
+    TArray<FVector> SpreadOffsets;
+
+    // 콜리전 및 시각용 메쉬
+    UPROPERTY(VisibleAnywhere)
+    UBoxComponent* BoxComp;
+
+    UPROPERTY(VisibleAnywhere)
+    UStaticMeshComponent* MeshComp;
+
+private:
+    // 내부 관리용
+    float CurrentTime = 0.0f;
+
+    UPROPERTY()
+    TArray<AActorMonsterBase*> SpawnedMonsters;
+
+    // 몬스터가 파괴될 때 호출
+    UFUNCTION()
+    void OnMonsterDestroyed(AActor* DestroyedActor);
+
+    int32 TotalMonsterKilled = 0; // 전체 죽은 몬스터 수
+    float SpawnedMonsterHpMultiplier = 1.f; // 스탯 증가용 곱셈
+    float SpawnedMonsterAttackMultiplier = 1.f; // 공격력 증가용
 };

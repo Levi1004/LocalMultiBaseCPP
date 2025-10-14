@@ -26,6 +26,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -38,7 +39,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 TraceRate = 25;
-protected:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
 	int32 Hp = 100;
 
@@ -46,7 +47,7 @@ protected:
 	float CurrentHp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
-	int32 AttackPower = 5;
+	int32 AttackPower = 10;
 
 public:
 	void ApplyDamage(float Damage);
