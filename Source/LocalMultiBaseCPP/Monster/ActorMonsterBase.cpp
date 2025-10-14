@@ -51,6 +51,7 @@ void AActorMonsterBase::BeginPlay()
 
 	SetActorRotation(Direction.Rotation());
 
+    BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AActorMonsterBase::OnOverlap);
 }
 
 // Called every frame
@@ -101,6 +102,20 @@ void AActorMonsterBase::Tick(float DeltaTime)
 
     // --- [4] 디버그 시각화 ---
     DrawDebugLine(GetWorld(), MyLocation, ClosestPlayer->GetActorLocation(), FColor::Red, false, -1.f, 0, 2.f);
+}
+
+void AActorMonsterBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+
+    if (!OtherActor) return;
+
+    ALMBpawnPlayer* Player = Cast<ALMBpawnPlayer>(OtherActor);
+    if (Player)
+    {
+        Player->ApplyDamage(AttackPower, this); // AttackPower는 몬스터 공격력
+        Die(); // 충돌 후 즉시 사망
+    }
 }
 
 

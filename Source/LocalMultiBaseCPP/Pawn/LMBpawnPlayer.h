@@ -57,6 +57,9 @@ public:
 	UFUNCTION()
 	void AddExperience(int32 Exp);
 
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void ApplyDamage(float Damage, AActor* DamageInstigator);
+
 	// PlayerIndex에 따라 Mesh/Anim 설정
 	virtual void ApplyMeshByPlayerIndex() override;
 

@@ -169,6 +169,21 @@ void ALMBpawnPlayer::ApplyMeshByPlayerIndex()
 	
 }
 
+
+void ALMBpawnPlayer::ApplyDamage(float Damage, AActor* DamageInstigator)
+{
+	if (Damage <= 0.f) return;
+
+	CurrentHp -= Damage;
+
+	UE_LOG(LogTemp, Warning, TEXT("%s 받음: %f 피해. 남은 HP: %f"), *GetName(), Damage, CurrentHp);
+
+	if (CurrentHp <= 0.f)
+	{
+		Die(); // ALMBpawnBase::Die() 호출
+	}
+}
+
 void ALMBpawnPlayer::UseSkill(int32 SkillIndex)
 {
 	if (LMBAnim)
