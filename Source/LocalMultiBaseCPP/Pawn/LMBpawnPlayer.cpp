@@ -140,7 +140,7 @@ void ALMBpawnPlayer::ApplyMeshByPlayerIndex()
 		SpawnLocation = FVector(3200.f, -3200.f, 30.f);
 		break;
 	default:
-		UE_LOG(LogTemp, Warning, TEXT("PlayerIndex에 해당하는 메쉬/AnimClass 없음"));
+		//UE_LOG(LogTemp, Warning, TEXT("PlayerIndex에 해당하는 메쉬/AnimClass 없음"));
 		return;
 	}
 
@@ -175,7 +175,7 @@ void ALMBpawnPlayer::UseSkill(int32 SkillIndex)
 	{
 		LMBAnim->PlaySkillMontage(PlayerIndex + 1, SkillIndex);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s : 스킬 %d 발동"), *GetName(), SkillIndex);
+	//UE_LOG(LogTemp, Warning, TEXT("%s : 스킬 %d 발동"), *GetName(), SkillIndex);
 
 	if (AttackComp)
 	{
@@ -185,5 +185,5 @@ void ALMBpawnPlayer::UseSkill(int32 SkillIndex)
 
 void ALMBpawnPlayer::EndAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s : 스킬/공격 종료"), *GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("%s : 스킬/공격 종료"), *GetName());
 }

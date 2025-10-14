@@ -46,7 +46,7 @@ public:
 	float HpIncreasePerLevel = 20.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float AttackIncreasePerLevel = 5.f;
+	float AttackIncreasePerLevel = 5.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	int32 ExpToLevelUp = 100;

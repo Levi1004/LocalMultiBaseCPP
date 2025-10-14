@@ -42,7 +42,7 @@
 
         // 디버그 라인
         DrawDebugLine(OwnerActor->GetWorld(), Start, End, FColor::Red, true, 10.f, 0, 10.f);
-        UE_LOG(LogTemp, Warning, TEXT("PerformAttack called! Start=%s End=%s"), *Start.ToString(), *End.ToString());
+       // UE_LOG(LogTemp, Warning, TEXT("PerformAttack called! Start=%s End=%s"), *Start.ToString(), *End.ToString());
     }
 
 
