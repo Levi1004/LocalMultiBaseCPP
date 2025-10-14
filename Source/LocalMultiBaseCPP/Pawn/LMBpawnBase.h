@@ -63,8 +63,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Defence = 5.0f;	
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	int32 Level = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	int32 PlayerIndex = -1;

@@ -100,7 +100,28 @@ void ALMBpawnPlayer::PossessedBy(AController* NewController)
 		LMBPC->AddPawnPlayer(this);
 	}
 }
+void ALMBpawnPlayer::AddExperience(int32 Exp)
+{
+	CurrentExp += Exp;
+	UE_LOG(LogTemp, Warning, TEXT("%s 경험치 획득: %d, 현재 경험치: %d"), *GetName(), Exp, CurrentExp);
 
+	while (CurrentExp >= ExpToLevelUp)
+	{
+		CurrentExp -= ExpToLevelUp;
+		Level++;
+
+		// 스탯 증가
+		MaxHealth += HpIncreasePerLevel;
+		CurrentHp = MaxHealth;
+		AttackPower += AttackIncreasePerLevel;
+
+		// 다음 레벨업 필요 경험치 업데이트
+		ExpToLevelUp = FMath::RoundToInt(ExpToLevelUp * ExpGrowthRate);
+
+		UE_LOG(LogTemp, Warning, TEXT("%s 레벨업! 현재 레벨: %d, MaxHp: %.0f, AttackPower: %.0f, 다음 레벨업 경험치: %d"),
+			*GetName(), Level, MaxHealth, AttackPower, ExpToLevelUp);
+	}
+}
 void ALMBpawnPlayer::ApplyMeshByPlayerIndex()
 {
 	FString MeshPath = TEXT("/Game/Assets/Male/Dwarf_Idle.Dwarf_Idle");

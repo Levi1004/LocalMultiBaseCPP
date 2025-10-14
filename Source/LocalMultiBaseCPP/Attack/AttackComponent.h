@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -17,6 +17,6 @@ public:
 	UAttackComponent();
 
 
-	/** ½ÇÁ¦ °ø°İ ¼öÇà (¶óÀÎ Æ®·¹ÀÌ½º) */
+	/** ì‹¤ì œ ê³µê²© ìˆ˜í–‰ (ë¼ì¸ íŠ¸ë ˆì´ìŠ¤) */
 	void PerformAttack(AActor* OwnerActor, float AttackRange = 200.f);
 };

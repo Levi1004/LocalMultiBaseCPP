@@ -4,7 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Pawn/LMBpawnPlayer.h"
 #include "ActorMonsterBase.generated.h"
+
+
+class UBoxComponent;
+class USkeletalMeshComponent;
+class ALMBpawnPlayer;
 
 UENUM(BlueprintType)
 enum class EMonsterMovePhase : uint8
@@ -49,8 +55,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster Stats")
 	int32 AttackPower = 10;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ExperienceValue = 50; // 죽으면 주는 경험치
+
+	UPROPERTY()
+	ALMBpawnPlayer* LastDamageInstigator;
+
+
 public:
-	void ApplyDamage(float Damage);
+	void ApplyDamage(float Damage, ALMBpawnPlayer* DamageInstigatorPlayer);
 	// 데미지 처리
 
 	void Die();

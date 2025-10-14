@@ -35,6 +35,28 @@ public:
 	// PlayerIndex에 따라 스탯 초기화
 	void InitializePlayerStats(int32 InPlayerIndex);
 
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 CurrentExp = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float HpIncreasePerLevel = 20.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float AttackIncreasePerLevel = 5.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	int32 ExpToLevelUp = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float ExpGrowthRate = 1.2f;
+
+	UFUNCTION()
+	void AddExperience(int32 Exp);
+
 	// PlayerIndex에 따라 Mesh/Anim 설정
 	virtual void ApplyMeshByPlayerIndex() override;
 

@@ -105,10 +105,13 @@ void AActorMonsterBase::Tick(float DeltaTime)
 
 
 
-void AActorMonsterBase::ApplyDamage(float Damage)
+void AActorMonsterBase::ApplyDamage(float Damage, ALMBpawnPlayer* DamageInstigator)
 {
     if (Damage <= 0.f) return;
+
     CurrentHp -= Damage;
+    LastDamageInstigator = DamageInstigator;
+
     UE_LOG(LogTemp, Warning, TEXT("%s took %f damage. Remaining HP: %f"), *GetName(), Damage, CurrentHp);
 
     if (CurrentHp <= 0.f)
@@ -120,7 +123,12 @@ void AActorMonsterBase::ApplyDamage(float Damage)
 void AActorMonsterBase::Die()
 {
     UE_LOG(LogTemp, Warning, TEXT("%s 사망"), *GetName());
+
+    if (LastDamageInstigator)
+    {
+        LastDamageInstigator->AddExperience(ExperienceValue);
+    }
+
     Destroy();
 }
-
 
