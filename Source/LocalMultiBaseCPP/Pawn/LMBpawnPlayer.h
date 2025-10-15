@@ -54,6 +54,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float ExpGrowthRate = 1.2f;
 
+	UFUNCTION(BlueprintPure, Category = "Stats")
+	float GetExpRatio() const;
+
 	UFUNCTION()
 	void AddExperience(int32 Exp);
 

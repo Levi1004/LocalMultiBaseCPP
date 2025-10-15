@@ -61,7 +61,7 @@ public:
 	int32 AttackPower = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ExperienceValue = 50; // 죽으면 주는 경험치
+	int32 ExperienceValue = 20; // 죽으면 주는 경험치
 
 	UPROPERTY()
 	ALMBpawnPlayer* LastDamageInstigator;

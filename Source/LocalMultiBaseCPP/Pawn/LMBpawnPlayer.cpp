@@ -46,6 +46,14 @@ void ALMBpawnPlayer::InitializePlayerStats(int32 InPlayerIndex)
 
 	// 스탯 적용
 	CurrentHp = MaxHealth;
+
+	Level = 1;
+	CurrentExp = 0;
+	ExpToLevelUp = 100;       // 기본 레벨업 필요 경험치
+	ExpGrowthRate = 1.2f;     // 필요하다면 초기화
+
+	UE_LOG(LogTemp, Warning, TEXT("%s 초기화 완료. HP: %.1f, Attack: %.1f, Level: %d, Exp: %d/%d"),
+		*PlayerName, MaxHealth, AttackPower, Level, CurrentExp, ExpToLevelUp);
 }
 
 void ALMBpawnPlayer::BeginPlay()
@@ -99,6 +107,12 @@ void ALMBpawnPlayer::PossessedBy(AController* NewController)
 	{
 		LMBPC->AddPawnPlayer(this);
 	}
+}
+float ALMBpawnPlayer::GetExpRatio() const
+{
+	if (ExpToLevelUp <= 0) return 0.f;
+	float Ratio = static_cast<float>(CurrentExp) / static_cast<float>(ExpToLevelUp);
+	return FMath::Clamp(Ratio, 0.f, 1.f);
 }
 void ALMBpawnPlayer::AddExperience(int32 Exp)
 {
