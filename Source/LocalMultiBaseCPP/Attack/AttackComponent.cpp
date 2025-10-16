@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Pawn/LMBpawnPlayer.h"
 #include "Monster/ActorMonsterBase.h"
+#include "Monster/BossMonster.h"
 
 // Sets default values for this component's properties
  UAttackComponent::UAttackComponent()
@@ -13,8 +14,8 @@
         PrimaryComponentTick.bCanEverTick = false;
  }
 
- void UAttackComponent::PerformAttack(AActor * OwnerActor, float AttackRange)
-    {
+ void UAttackComponent::PerformAttack(AActor* OwnerActor, float AttackRange)
+ {
      if (!OwnerActor) return;
 
      FVector Start = OwnerActor->GetActorLocation() + FVector(0, 0, 100); // 캐릭터 높이 보정
@@ -26,17 +27,18 @@
 
      if (OwnerActor->GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
      {
+         ALMBpawnPlayer* Player = Cast<ALMBpawnPlayer>(OwnerActor);
+         float Damage = Player ? Player->AttackPower : 0.f;
+
          if (AActorMonsterBase* HitMonster = Cast<AActorMonsterBase>(Hit.GetActor()))
          {
-             ALMBpawnPlayer* Player = Cast<ALMBpawnPlayer>(OwnerActor);
-             float Damage = 0.f;
-
-             if (Player)
-             {
-                 Damage = Player->AttackPower;
-                 HitMonster->ApplyDamage(Damage, Player);
-                 UE_LOG(LogTemp, Warning, TEXT("%s hit %s for %f damage"), *OwnerActor->GetName(), *HitMonster->GetName(), Damage);
-             }
+             HitMonster->ApplyDamage(Damage, Player);
+             UE_LOG(LogTemp, Warning, TEXT("%s hit Monster %s for %f damage"), *OwnerActor->GetName(), *HitMonster->GetName(), Damage);
+         }
+         else if (ABossMonster* HitBoss = Cast<ABossMonster>(Hit.GetActor())) 
+         {
+             HitBoss->ApplyDamage(Damage, Player);
+             UE_LOG(LogTemp, Warning, TEXT("%s hit Boss %s for %f damage"), *OwnerActor->GetName(), *HitBoss->GetName(), Damage);
          }
      }
 

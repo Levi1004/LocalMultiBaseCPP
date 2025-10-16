@@ -20,10 +20,12 @@ ALMBpawnBase::ALMBpawnBase()
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	SetRootComponent(BoxComponent);
 	BoxComponent->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
+	BoxComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 
 	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	MeshComponent->SetupAttachment(BoxComponent);
 
+	MeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -50.f));
 	// FObjectfinder<가져올 오브젝트 타입>
 	// CubeMesh : 변수 이름
 	// () 경로 입력
