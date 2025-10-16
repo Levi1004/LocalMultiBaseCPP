@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -26,27 +26,41 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
-	// µî·ÏµÈ ÇÃ·¹ÀÌ¾î ¹è¿­
+	// ë“±ë¡ëœ í”Œë ˆì´ì–´ ë°°ì—´
 	UPROPERTY()
 	TArray<ALMBpawnPlayer*> PawnPlayers;
 
 public:
-	// ºí·çÇÁ¸°Æ®¿¡¼­ È£Ãâ °¡´É
+	// ë¸”ë£¨í”„ë¦°íŠ¸ì—ì„œ í˜¸ì¶œ ê°€ëŠ¥
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void AddPawnPlayer(ALMBpawnPlayer* NewPlayer);
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	FORCEINLINE ALMBpawnPlayer* GetPlayerByIndex(int32 Index) 
+	{
+		if (PawnPlayers[Index] != nullptr)
+		{
+			return PawnPlayers[Index];
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("í•´ë‹¹ ì¸ë±ìŠ¤ì— í”Œë ˆì´ì–´ëŠ” nullptr ì…ë‹ˆë‹¤."));
+			return nullptr;
+		}
+	}
 
 protected:
 	// Input Mapping Context
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputMappingContext* IMC_LMBPlayerInput;
 
-	// ÀÌµ¿
+	// ì´ë™
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputAction* IA_Move1P;
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputAction* IA_Move2P;
 
-	// 1P ½ºÅ³ (U/I/J/K)
+	// 1P ìŠ¤í‚¬ (U/I/J/K)
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputAction* IA_Skill1P_U;
 	UPROPERTY(VisibleAnywhere, Category = "Input")
@@ -56,7 +70,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputAction* IA_Skill1P_K;
 
-	// 2P ½ºÅ³ (NumPad 4/5/1/2)
+	// 2P ìŠ¤í‚¬ (NumPad 4/5/1/2)
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputAction* IA_Skill2P_4;
 	UPROPERTY(VisibleAnywhere, Category = "Input")
@@ -67,17 +81,17 @@ protected:
 	UInputAction* IA_Skill2P_2;
 
 private:
-	// ÀÌµ¿
+	// ì´ë™
 	void OnInputMove1P(const FInputActionValue& Value);
 	void OnInputMove2P(const FInputActionValue& Value);
 
-	// 1P ½ºÅ³
+	// 1P ìŠ¤í‚¬
 	void OnSkill1P_U(); // Attack
 	void OnSkill1P_I(); // Skill1
 	void OnSkill1P_J(); // Skill2
 	void OnSkill1P_K(); // Skill3
 
-	// 2P ½ºÅ³
+	// 2P ìŠ¤í‚¬
 	void OnSkill2P_4(); // Attack
 	void OnSkill2P_5(); // Skill1
 	void OnSkill2P_1(); // Skill2
