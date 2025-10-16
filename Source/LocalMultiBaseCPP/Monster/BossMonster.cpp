@@ -49,17 +49,8 @@ void ABossMonster::BeginPlay()
 
 void ABossMonster::Tick(float DeltaTime)
 {
+
     Super::Tick(DeltaTime);
-
-    if (!TargetPlayer)
-    {
-        FindClosestPlayer();
-    }
-    else
-    {
-        MoveTowardsPlayer(DeltaTime);
-    }
-
 
     if (bIsDead) return; // 죽으면 아무것도 안 함
 
@@ -70,8 +61,10 @@ void ABossMonster::Tick(float DeltaTime)
         FindClosestPlayer();
     }
 
-    if (TargetPlayer)
+    // 타겟이 있으면 이동 및 공격 처리
+    if (TargetPlayer && !bIsDead)
     {
+        // 이동 및 공격은 MoveTowardsPlayer에서 처리
         MoveTowardsPlayer(DeltaTime);
     }
 }
@@ -123,20 +116,24 @@ void ABossMonster::MoveTowardsPlayer(float DeltaTime)
 // 공격, 회전 및 데미지 로직은 기존 ApplyDamage 방식 그대로 사용
 void ABossMonster::PerformAttack()
 {
-    if (!bCanAttack || !TargetPlayer || bIsDead || TargetPlayer->IsDead()) return;
+    if (!bCanAttack || bIsAttacking || !TargetPlayer || bIsDead || TargetPlayer->IsDead())
+        return;
 
     bCanAttack = false;
     bIsAttacking = true;
 
-    if (AttackMontage)
+    // 공격 애니메이션 재생
+    if (AttackMontages.Num() > 0)
     {
-        UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-        if (AnimInstance)
+        int32 Index = FMath::RandRange(0, AttackMontages.Num() - 1);
+        UAnimMontage* SelectedMontage = AttackMontages[Index];
+        if (SelectedMontage)
         {
-            AnimInstance->Montage_Play(AttackMontage);
+            GetMesh()->GetAnimInstance()->Montage_Play(SelectedMontage);
         }
     }
 
+    // 데미지 판정 (라인 트레이스)
     FHitResult HitResult;
     FVector Start = GetActorLocation();
     FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -144,26 +141,23 @@ void ABossMonster::PerformAttack()
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
-    DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 3.f, 0, 5.f);
-
-
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
     if (bHit)
     {
-        ALMBpawnPlayer* HitPlayer = Cast<ALMBpawnPlayer>(HitResult.GetActor());
-        if (HitPlayer)
+        if (ALMBpawnPlayer* HitPlayer = Cast<ALMBpawnPlayer>(HitResult.GetActor()))
         {
-            UE_LOG(LogTemp, Warning, TEXT("BossMonster hit %s!"), *HitPlayer->GetName());
-            HitPlayer->ApplyDamage(AttackDamage, this);
+            float Damage = AttackDamage;
+            if (AttackDamages.Num() > 0)
+            {
+                int32 Index = FMath::Clamp(FMath::RandRange(0, AttackDamages.Num() - 1), 0, AttackDamages.Num() - 1);
+                Damage = AttackDamages[Index];
+            }
+
+            HitPlayer->ApplyDamage(Damage, this);
         }
     }
 
-    DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.f, 0, 3.f);
-    if (bHit && HitResult.GetActor())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("라인 트레이스 충돌: %s"), *HitResult.GetActor()->GetName());
-    }
-
+    // 공격 쿨다운 후 ResetAttack 호출
     GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABossMonster::ResetAttack, AttackCooldown, false);
 }
 

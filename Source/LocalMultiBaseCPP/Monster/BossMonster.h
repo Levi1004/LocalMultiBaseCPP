@@ -69,7 +69,10 @@ public:
     // Animations
     // ----------------------
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
-    UAnimMontage* AttackMontage;
+    TArray<UAnimMontage*> AttackMontages; // 여러 공격 모션
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+    TArray<float> AttackDamages; // 각 공격 모션별 데미지
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
     UAnimMontage* DeathMontage;
