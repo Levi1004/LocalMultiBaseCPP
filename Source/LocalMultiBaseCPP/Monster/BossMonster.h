@@ -30,9 +30,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     UBoxComponent* HitBox;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    USkeletalMeshComponent* SkeletalMeshComp;
-
+    // Character 기반이므로 SkeletalMesh는 GetMesh() 사용
     // ----------------------
     // Stats
     // ----------------------
@@ -48,17 +46,33 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
     float MoveSpeed = 300.f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-    float AttackRange = 150.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Attack")
+    float AttackRange = 500.f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-    float ExperienceValue = 500.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Attack")
+    float AttackDamage = 30.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Attack")
+    float AttackCooldown = 2.0f;
+
+    FTimerHandle AttackTimerHandle;
+    bool bCanAttack;
+    bool bIsAttacking;
+    bool bIsDead = false;
+    // ----------------------
+    // Target
+    // ----------------------
+    UPROPERTY()
+    ALMBpawnPlayer* TargetPlayer;
 
     // ----------------------
     // Animations
     // ----------------------
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
     UAnimMontage* AttackMontage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+    UAnimMontage* DeathMontage;
 
     // ----------------------
     // Combat
@@ -71,12 +85,10 @@ public:
 
     void PerformAttack();
 
+    UFUNCTION()
+    void ResetAttack();
+
 private:
-    ALMBpawnPlayer* TargetPlayer;
-
     void FindClosestPlayer();
-
     void MoveTowardsPlayer(float DeltaTime);
-
-    bool bIsAttacking;
 };

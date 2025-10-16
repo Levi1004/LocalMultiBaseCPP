@@ -30,7 +30,7 @@ void ALMBpawnPlayer::InitializePlayerStats(int32 InPlayerIndex)
 	case 0: // 1P
 		PlayerName = TEXT("Warrior1");
 		MaxHealth = 200.f;
-		AttackPower = 25.f;
+		AttackPower = 500.f;
 		Defence = 5.f;
 		break;
 	case 1: // 2P
@@ -107,6 +107,10 @@ void ALMBpawnPlayer::PossessedBy(AController* NewController)
 	{
 		LMBPC->AddPawnPlayer(this);
 	}
+}
+bool ALMBpawnPlayer::IsDead() const
+{
+	return CurrentHp <= 0.f;
 }
 float ALMBpawnPlayer::GetExpRatio() const
 {

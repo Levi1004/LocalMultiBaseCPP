@@ -19,8 +19,8 @@ ALMBpawnBase::ALMBpawnBase()
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	SetRootComponent(BoxComponent);
-	BoxComponent->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
-	BoxComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	BoxComponent->SetBoxExtent(FVector(50.0f, 50.0f, 100.0f));
+	BoxComponent->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
 
 	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	MeshComponent->SetupAttachment(BoxComponent);

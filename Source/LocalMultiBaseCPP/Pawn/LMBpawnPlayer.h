@@ -77,4 +77,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attack")
 	class UAttackComponent* AttackComp;
+
+	bool IsDead() const;
 };
