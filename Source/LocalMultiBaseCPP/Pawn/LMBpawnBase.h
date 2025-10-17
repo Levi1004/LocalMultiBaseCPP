@@ -28,7 +28,7 @@ protected:
 	class UFloatingPawnMovement* PawnMovement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float MaxSpeed = 700.0f;
+	float MaxSpeed = 2000.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float CameraRotationSpeed = 100.f;

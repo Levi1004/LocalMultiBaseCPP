@@ -35,7 +35,7 @@ public:
     float DelayTime = 2.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
-    int32 MaxSpawnCount = 25;
+    int32 MaxSpawnCount = 5;
 
     // 몬스터 스폰 위치 오프셋
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")

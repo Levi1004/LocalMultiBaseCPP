@@ -18,8 +18,12 @@
  {
      if (!OwnerActor) return;
 
-     FVector Start = OwnerActor->GetActorLocation() + FVector(0, 0, 100); // 캐릭터 높이 보정
-     FVector End = Start + OwnerActor->GetActorForwardVector() * AttackRange;
+     float ScaleFactor = OwnerActor->GetActorScale3D().X; // 일반적으로 X, Y, Z 동일
+     float ScaledRange = AttackRange * ScaleFactor;
+
+
+     FVector Start = OwnerActor->GetActorLocation() + FVector(0, 0, 500); // 캐릭터 높이 보정
+     FVector End = Start + OwnerActor->GetActorForwardVector() * ScaledRange;
 
      FHitResult Hit;
      FCollisionQueryParams Params;

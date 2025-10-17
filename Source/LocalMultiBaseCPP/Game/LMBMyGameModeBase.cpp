@@ -6,7 +6,7 @@
 #include "Pawn/LMBpawnPlayer.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
-
+#include "Engine/GameInstance.h"
 
 
 ALMBMyGameModeBase::ALMBMyGameModeBase()
@@ -88,26 +88,30 @@ ULocalPlayer* ALMBMyGameModeBase::CreateLocalPlayer()
 	return nullptr;
 }
 
-ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(
-	                                                    UWorld* World, 
-	                                                    APlayerStart* PlayerStart, 
-	                                                    APlayerController* PlayerController)
+ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerStart* PlayerStart, APlayerController* PlayerController)
 {
+	if (!World || !PlayerStart || !PlayerController)
+		return nullptr;
+
+	// BP_PlayerClass가 지정되어 있으면 그걸로 스폰
+	TSubclassOf<ALMBpawnPlayer> ClassToSpawn = BP_PlayerClass ? BP_PlayerClass : LMBpawnPlayerClass;
+
 	ALMBpawnPlayer* NewPawn = World->SpawnActor<ALMBpawnPlayer>(
-		                              LMBpawnPlayerClass, 
-		                              PlayerStart->GetActorLocation(), 
-		                              PlayerStart->GetActorRotation()
-	                                  );
-	check(NewPawn);
-	
+		ClassToSpawn,
+		PlayerStart->GetActorLocation(),
+		PlayerStart->GetActorRotation()
+	);
+
+	if (!NewPawn)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Pawn spawn failed for player %d"), CurrentPlayerIndex);
+		return nullptr;
+	}
+
 	NewPawn->SetPlayerIndex(CurrentPlayerIndex);
-	NewPawn->InitializePlayerStats(CurrentPlayerIndex); 
-
-
-	// 플레이어 컨트롤러에 새로 생성한 Pawn을 빙의
+	NewPawn->InitializePlayerStats(CurrentPlayerIndex);
 	PlayerController->Possess(NewPawn);
 
-	UE_LOG(LogTemp, Warning, TEXT("%d 번 가 스폰 됐습니다."), CurrentPlayerIndex);
-    return nullptr;
+	UE_LOG(LogTemp, Warning, TEXT("%dP (%s)이 스폰되었습니다."), CurrentPlayerIndex + 1, *NewPawn->GetName());
+	return NewPawn;
 }
-

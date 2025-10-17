@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ALMBpawnPlayer> LMBpawnPlayerClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	TSubclassOf<class ALMBpawnPlayer> BP_PlayerClass;
+
 private:
 	class APlayerStart* FindPlayerStart( UWorld* CurrentWorld, const FName& TargetTag);
 

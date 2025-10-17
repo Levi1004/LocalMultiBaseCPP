@@ -61,15 +61,15 @@ void ALMBpawnPlayer::BeginPlay()
 	Super::BeginPlay();
 	ApplyMeshByPlayerIndex();
 
+	SetActorScale3D(FVector(5.f));
+
 	USkeletalMesh* SwordMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/Assets/Weapon/InfinityBladeWeapons/Weapons/Blade/Swords/Blade_HeroSword11/SK_Blade_HeroSword11.SK_Blade_HeroSword11"));
 	if (SwordMesh)
 	{
 		USkeletalMeshComponent* SwordComp = NewObject<USkeletalMeshComponent>(this);
 		SwordComp->SetSkeletalMesh(SwordMesh);
-		SwordComp->RegisterComponent(); // 반드시 컴포넌트 등록
-		SwordComp->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RightHandSocket"));
-
-		
+		SwordComp->RegisterComponent();
+		SwordComp->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("RightHandSocket"));
 	}
 }
 
@@ -152,10 +152,10 @@ void ALMBpawnPlayer::ApplyMeshByPlayerIndex()
 	switch (PlayerIndex)
 	{
 	case 0:
-		SpawnLocation = FVector(3000.f, 3000.f, 20.f);
+		SpawnLocation = FVector(3000.f, 3000.f, 100.f);
 		break;
 	case 1:
-		SpawnLocation = FVector(3200.f, -3200.f, 30.f);
+		SpawnLocation = FVector(3000.f, -3000.f, 100.f);
 		break;
 	default:
 		//UE_LOG(LogTemp, Warning, TEXT("PlayerIndex에 해당하는 메쉬/AnimClass 없음"));
