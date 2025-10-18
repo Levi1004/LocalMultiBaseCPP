@@ -6,6 +6,10 @@
 #include "Pawn/LMBpawnPlayer.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Components/Button.h"
+#include "Blueprint/UserWidget.h"
 #include "Engine/GameInstance.h"
 
 
@@ -114,4 +118,74 @@ ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerSt
 
 	UE_LOG(LogTemp, Warning, TEXT("%dP (%s)이 스폰되었습니다."), CurrentPlayerIndex + 1, *NewPawn->GetName());
 	return NewPawn;
+}
+
+void ALMBMyGameModeBase::CheckGameOver()
+{
+	bool bAllDead = true;
+
+	// 씬에 존재하는 모든 플레이어 Pawn 체크
+	for (TActorIterator<ALMBpawnPlayer> It(GetWorld()); It; ++It)
+	{
+		ALMBpawnPlayer* Player = *It;
+		if (Player && !Player->IsDead())
+		{
+			bAllDead = false;
+			break;
+		}
+	}
+
+	if (bAllDead)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("게임 오버! 모든 플레이어 사망"));
+
+		// 이미 UI가 띄워져 있다면 제거
+		if (ActiveWidget)
+		{
+			ActiveWidget->RemoveFromParent();
+			ActiveWidget = nullptr;
+		}
+
+		if (GameOverWidgetClass)
+		{
+			ActiveWidget = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
+			if (ActiveWidget)
+			{
+				ActiveWidget->AddToViewport();
+			}
+		}
+
+		// 게임 로직 정지 (옵션)
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+	}
+}
+
+void ALMBMyGameModeBase::ShowGameOverWidget()
+{
+	if (!GameOverWidgetClass) return;
+
+	GameOverWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
+	if (GameOverWidgetInstance)
+	{
+		GameOverWidgetInstance->AddToViewport();
+		UE_LOG(LogTemp, Warning, TEXT("게임 오버 위젯 표시 완료"));
+
+		// 버튼 바인딩 시도
+		if (UButton* RestartButton = Cast<UButton>(GameOverWidgetInstance->GetWidgetFromName(TEXT("RestartButton"))))
+		{
+			RestartButton->OnClicked.AddDynamic(this, &ALMBMyGameModeBase::OnRestartClicked);
+		}
+
+		// 게임 정지 (선택)
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+	}
+}
+
+void ALMBMyGameModeBase::OnRestartClicked()
+{
+	UE_LOG(LogTemp, Warning, TEXT("다시 시작 클릭"));
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+
+	FName CurrentLevel = *UGameplayStatics::GetCurrentLevelName(GetWorld());
+	UGameplayStatics::OpenLevel(GetWorld(), CurrentLevel);
 }

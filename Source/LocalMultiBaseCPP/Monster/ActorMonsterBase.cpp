@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Pawn/LMBpawnPlayer.h"
 
 
@@ -120,15 +121,25 @@ void AActorMonsterBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* O
 }
 
 
-
 void AActorMonsterBase::ApplyDamage(float Damage, ALMBpawnPlayer* DamageInstigator)
 {
-    if (Damage <= 0.f) return;
+    if (Damage <= 0.f || bIsDead) return;
 
     CurrentHp -= Damage;
     LastDamageInstigator = DamageInstigator;
 
     UE_LOG(LogTemp, Warning, TEXT("%s took %f damage. Remaining HP: %f"), *GetName(), Damage, CurrentHp);
+
+    //  피격 이펙트
+    if (HitEffect)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(),
+            HitEffect,
+            GetActorLocation() + FVector(0, 0, 500), // 위치 보정
+            FRotator::ZeroRotator
+        );
+    }
 
     if (CurrentHp <= 0.f)
     {

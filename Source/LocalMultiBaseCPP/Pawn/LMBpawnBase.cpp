@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Game/LMBMyGameModeBase.h"
 #include "Animation/LMBAnimInstance.h"
 
 
@@ -124,6 +125,11 @@ float ALMBpawnBase::TakeDamage(
 void ALMBpawnBase::Die()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s has died"), *GetName());
+	if (ALMBMyGameModeBase* GM = Cast<ALMBMyGameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->CheckGameOver();
+	}
+
 	Destroy();
 }
 void ALMBpawnBase::ApplyMeshByPlayerIndex()

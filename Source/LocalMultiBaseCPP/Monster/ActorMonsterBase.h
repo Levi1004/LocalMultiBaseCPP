@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Pawn/LMBpawnPlayer.h"
+#include "NiagaraSystem.h"
 #include "ActorMonsterBase.generated.h"
 
 
@@ -65,6 +66,10 @@ public:
 
 	UPROPERTY()
 	ALMBpawnPlayer* LastDamageInstigator;
+
+	// ««∞› ¿Ã∆Â∆Æ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	UNiagaraSystem* HitEffect;
 
 
 public:
