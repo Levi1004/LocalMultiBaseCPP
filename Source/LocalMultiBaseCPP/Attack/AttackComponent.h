@@ -18,5 +18,5 @@ public:
 
 
 	/** 실제 공격 수행 (라인 트레이스) */
-	void PerformAttack(AActor* OwnerActor, float AttackRange = 200.f);
+	void PerformAttack(AActor* OwnerActor, float AttackRange = 10000.f);
 };
