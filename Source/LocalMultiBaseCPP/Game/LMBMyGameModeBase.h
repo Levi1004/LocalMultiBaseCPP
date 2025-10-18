@@ -37,42 +37,35 @@ protected:
 	TSubclassOf<class ALMBpawnPlayer> BP_PlayerClass;
 
 private:
-	class APlayerStart* FindPlayerStart( UWorld* CurrentWorld, const FName& TargetTag);
+	class APlayerStart* FindPlayerStart(UWorld* CurrentWorld, const FName& TargetTag);
 
 	void SpawnLocalPlayer(UWorld* World, class APlayerStart* PlayerStart);
 
 	ULocalPlayer* CreateLocalPlayer();
 
 	class ALMBpawnPlayer* SpawnAndPossessPawn(
-		UWorld* World, 
-		class APlayerStart* PlayerStart, 
+		UWorld* World,
+		class APlayerStart* PlayerStart,
 		class APlayerController* PlayerController);
 
 public:
-
+	// 게임 오버 체크
 	UFUNCTION(BlueprintCallable)
 	void CheckGameOver();
 
-	// 클리어 UI 블루프린트 연결용
+	// 게임 오버 UI 연결
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
 
 private:
-
-
-	// 현재 화면에 띄운 UI를 참조
+	// 현재 화면에 띄운 UI
 	UPROPERTY()
 	UUserWidget* ActiveWidget = nullptr;
 
-	UFUNCTION(BlueprintCallable)
+	// 게임 오버 위젯 띄우기
 	void ShowGameOverWidget();
 
-	// 버튼 동작용 함수
+	// 버튼 동작용
 	UFUNCTION()
-	void OnRestartClicked();
-
-private:
-	UPROPERTY()
-	UUserWidget* GameOverWidgetInstance;
-
+	void OnGoToMainMenuClicked();
 };

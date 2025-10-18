@@ -20,18 +20,18 @@ ALMBMyGameModeBase::ALMBMyGameModeBase()
 	LMBpawnPlayerClass = ALMBpawnPlayer::StaticClass();
 }
 
-
-void ALMBMyGameModeBase::BeginPlay() // 캐릭터 스폰
+void ALMBMyGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	UWorld* CurrentWorld = GetWorld();
 	check(CurrentWorld);
-	
+
+	// 플레이어 스폰
 	for (int32 i = 0; i < MaxPlayerIndex; i++)
 	{
-		APlayerStart* Foundstart = FindPlayerStart(CurrentWorld, PlayerStartTags[i]);
-		SpawnLocalPlayer(CurrentWorld, Foundstart);
+		APlayerStart* FoundStart = FindPlayerStart(CurrentWorld, PlayerStartTags[i]);
+		SpawnLocalPlayer(CurrentWorld, FoundStart);
 	}
 }
 
@@ -39,40 +39,41 @@ APlayerStart* ALMBMyGameModeBase::FindPlayerStart(UWorld* CurrentWorld, const FN
 {
 	check(CurrentWorld);
 
-	for (TActorIterator<APlayerStart> Starts(CurrentWorld); Starts; ++Starts)
+	for (TActorIterator<APlayerStart> It(CurrentWorld); It; ++It)
 	{
-		APlayerStart* FoundStart = *Starts;
-		if (FoundStart && FoundStart->PlayerStartTag == TargetTag)
+		APlayerStart* Start = *It;
+		if (Start && Start->PlayerStartTag == TargetTag)
 		{
-			return FoundStart;
+			return Start;
 		}
 	}
-
-
 	return nullptr;
 }
 
 void ALMBMyGameModeBase::SpawnLocalPlayer(UWorld* World, APlayerStart* PlayerStart)
 {
+	if (!World || !PlayerStart) return;
+
 	APlayerController* PlayerController = nullptr;
 
 	if (CurrentPlayerIndex == 0)
 	{
-		// 처음 생성하는 플레이어라면
 		PlayerController = World->GetFirstPlayerController();
 	}
 	else
 	{
-		// 처음 생성하는 플레이어가 아니라면
-		// 생성할 때 언리얼 기본 플레이어 컨트롤러 할당
 		PlayerControllerClass = APlayerController::StaticClass();
-
 		ULocalPlayer* NewLocalPlayer = CreateLocalPlayer();
-
-		PlayerController = NewLocalPlayer->GetPlayerController(World);
+		PlayerController = NewLocalPlayer ? NewLocalPlayer->GetPlayerController(World) : nullptr;
 	}
 
-	check(PlayerController);
+	if (!PlayerController) return;
+
+	// 기존 Pawn Destroy (중복 방지)
+	if (PlayerController->GetPawn())
+	{
+		PlayerController->GetPawn()->Destroy();
+	}
 
 	SpawnAndPossessPawn(World, PlayerStart, PlayerController);
 
@@ -81,29 +82,27 @@ void ALMBMyGameModeBase::SpawnLocalPlayer(UWorld* World, APlayerStart* PlayerSta
 
 ULocalPlayer* ALMBMyGameModeBase::CreateLocalPlayer()
 {
-	// 현재 내 게임 전체에 영향을 끼치는 클래스
-	// 전역적으로 접근이 가능함
 	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance) return nullptr;
 
 	FString Error;
-	// UserId 여기에 -1을 넣으면 자동으로 최신 UserId를 넣어줌
 	return GameInstance->CreateLocalPlayer(-1, Error, true);
-
-	return nullptr;
 }
 
 ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerStart* PlayerStart, APlayerController* PlayerController)
 {
-	if (!World || !PlayerStart || !PlayerController)
-		return nullptr;
+	if (!World || !PlayerStart || !PlayerController) return nullptr;
 
-	// BP_PlayerClass가 지정되어 있으면 그걸로 스폰
 	TSubclassOf<ALMBpawnPlayer> ClassToSpawn = BP_PlayerClass ? BP_PlayerClass : LMBpawnPlayerClass;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Name = FName(*FString::Printf(TEXT("PlayerPawn%d"), CurrentPlayerIndex + 1));
 
 	ALMBpawnPlayer* NewPawn = World->SpawnActor<ALMBpawnPlayer>(
 		ClassToSpawn,
 		PlayerStart->GetActorLocation(),
-		PlayerStart->GetActorRotation()
+		PlayerStart->GetActorRotation(),
+		SpawnParams
 	);
 
 	if (!NewPawn)
@@ -124,7 +123,6 @@ void ALMBMyGameModeBase::CheckGameOver()
 {
 	bool bAllDead = true;
 
-	// 씬에 존재하는 모든 플레이어 Pawn 체크
 	for (TActorIterator<ALMBpawnPlayer> It(GetWorld()); It; ++It)
 	{
 		ALMBpawnPlayer* Player = *It;
@@ -139,23 +137,9 @@ void ALMBMyGameModeBase::CheckGameOver()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("게임 오버! 모든 플레이어 사망"));
 
-		// 이미 UI가 띄워져 있다면 제거
-		if (ActiveWidget)
-		{
-			ActiveWidget->RemoveFromParent();
-			ActiveWidget = nullptr;
-		}
+		ShowGameOverWidget();
 
-		if (GameOverWidgetClass)
-		{
-			ActiveWidget = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
-			if (ActiveWidget)
-			{
-				ActiveWidget->AddToViewport();
-			}
-		}
-
-		// 게임 로직 정지 (옵션)
+		// 게임 일시정지
 		UGameplayStatics::SetGamePaused(GetWorld(), true);
 	}
 }
@@ -164,28 +148,28 @@ void ALMBMyGameModeBase::ShowGameOverWidget()
 {
 	if (!GameOverWidgetClass) return;
 
-	GameOverWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
-	if (GameOverWidgetInstance)
+	if (ActiveWidget)
 	{
-		GameOverWidgetInstance->AddToViewport();
-		UE_LOG(LogTemp, Warning, TEXT("게임 오버 위젯 표시 완료"));
+		ActiveWidget->RemoveFromParent();
+		ActiveWidget = nullptr;
+	}
 
-		// 버튼 바인딩 시도
-		if (UButton* RestartButton = Cast<UButton>(GameOverWidgetInstance->GetWidgetFromName(TEXT("RestartButton"))))
-		{
-			RestartButton->OnClicked.AddDynamic(this, &ALMBMyGameModeBase::OnRestartClicked);
-		}
+	ActiveWidget = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
+	if (!ActiveWidget) return;
 
-		// 게임 정지 (선택)
-		UGameplayStatics::SetGamePaused(GetWorld(), true);
+	ActiveWidget->AddToViewport();
+
+	// 버튼 바인딩
+	if (UButton* RestartButton = Cast<UButton>(ActiveWidget->GetWidgetFromName(TEXT("RestartButton"))))
+	{
+		RestartButton->OnClicked.AddDynamic(this, &ALMBMyGameModeBase::OnGoToMainMenuClicked);
 	}
 }
 
-void ALMBMyGameModeBase::OnRestartClicked()
+void ALMBMyGameModeBase::OnGoToMainMenuClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("다시 시작 클릭"));
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 
-	FName CurrentLevel = *UGameplayStatics::GetCurrentLevelName(GetWorld());
-	UGameplayStatics::OpenLevel(GetWorld(), CurrentLevel);
+	// MainMenu 레벨로 이동
+	UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
 }
