@@ -8,6 +8,7 @@
 	#include "GameFramework/SpringArmComponent.h"
 	#include "Camera/CameraComponent.h"
 	#include "Components/BoxComponent.h"
+    #include "Kismet/GameplayStatics.h" 
 
 ALMBpawnPlayer::ALMBpawnPlayer()
 {
@@ -209,6 +210,11 @@ void ALMBpawnPlayer::UseSkill(int32 SkillIndex)
 		LMBAnim->PlaySkillMontage(PlayerIndex + 1, SkillIndex);
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("%s : 스킬 %d 발동"), *GetName(), SkillIndex);
+	if (SkillSwingSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SkillSwingSound, GetActorLocation());
+	}
+
 
 	if (AttackComp)
 	{

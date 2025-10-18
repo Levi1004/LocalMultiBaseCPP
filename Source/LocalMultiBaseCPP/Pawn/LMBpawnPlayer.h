@@ -69,6 +69,9 @@ public:
 	// 스킬 사용
 	virtual void UseSkill(int32 SkillIndex) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* SkillSwingSound;
+
 	// 공격 종료
 	virtual void EndAttack() override;
 
