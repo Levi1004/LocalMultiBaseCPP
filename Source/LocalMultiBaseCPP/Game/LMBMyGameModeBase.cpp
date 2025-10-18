@@ -7,11 +7,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Components/Button.h"
-#include "Blueprint/UserWidget.h"
 #include "Engine/GameInstance.h"
-
 
 ALMBMyGameModeBase::ALMBMyGameModeBase()
 {
@@ -25,19 +21,25 @@ void ALMBMyGameModeBase::BeginPlay()
 	Super::BeginPlay();
 
 	UWorld* CurrentWorld = GetWorld();
-	check(CurrentWorld);
+	if (!CurrentWorld) return;
 
-	// 플레이어 스폰
 	for (int32 i = 0; i < MaxPlayerIndex; i++)
 	{
 		APlayerStart* FoundStart = FindPlayerStart(CurrentWorld, PlayerStartTags[i]);
-		SpawnLocalPlayer(CurrentWorld, FoundStart);
+		if (FoundStart)
+		{
+			SpawnLocalPlayer(CurrentWorld, FoundStart);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PlayerStart with tag %s not found!"), *PlayerStartTags[i].ToString());
+		}
 	}
 }
 
 APlayerStart* ALMBMyGameModeBase::FindPlayerStart(UWorld* CurrentWorld, const FName& TargetTag)
 {
-	check(CurrentWorld);
+	if (!CurrentWorld) return nullptr;
 
 	for (TActorIterator<APlayerStart> It(CurrentWorld); It; ++It)
 	{
@@ -69,14 +71,13 @@ void ALMBMyGameModeBase::SpawnLocalPlayer(UWorld* World, APlayerStart* PlayerSta
 
 	if (!PlayerController) return;
 
-	// 기존 Pawn Destroy (중복 방지)
-	if (PlayerController->GetPawn())
+	// 기존 Pawn 제거
+	if (APawn* ExistingPawn = PlayerController->GetPawn())
 	{
-		PlayerController->GetPawn()->Destroy();
+		ExistingPawn->Destroy();
 	}
 
 	SpawnAndPossessPawn(World, PlayerStart, PlayerController);
-
 	CurrentPlayerIndex++;
 }
 
@@ -96,7 +97,7 @@ ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerSt
 	TSubclassOf<ALMBpawnPlayer> ClassToSpawn = BP_PlayerClass ? BP_PlayerClass : LMBpawnPlayerClass;
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Name = FName(*FString::Printf(TEXT("PlayerPawn%d"), CurrentPlayerIndex + 1));
+	SpawnParams.Name = FName(*FString::Printf(TEXT("PlayerPawn%d"), CurrentPlayerIndex));
 
 	ALMBpawnPlayer* NewPawn = World->SpawnActor<ALMBpawnPlayer>(
 		ClassToSpawn,
@@ -115,11 +116,11 @@ ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerSt
 	NewPawn->InitializePlayerStats(CurrentPlayerIndex);
 	PlayerController->Possess(NewPawn);
 
-	UE_LOG(LogTemp, Warning, TEXT("%dP (%s)이 스폰되었습니다."), CurrentPlayerIndex + 1, *NewPawn->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("%dP (%s) spawned."), CurrentPlayerIndex + 1, *NewPawn->GetName());
 	return NewPawn;
 }
 
-void ALMBMyGameModeBase::CheckGameOver()
+void ALMBMyGameModeBase::CheckGameOver_Implementation()
 {
 	bool bAllDead = true;
 
@@ -137,39 +138,7 @@ void ALMBMyGameModeBase::CheckGameOver()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("게임 오버! 모든 플레이어 사망"));
 
-		ShowGameOverWidget();
-
-		// 게임 일시정지
-		UGameplayStatics::SetGamePaused(GetWorld(), true);
+		// 레벨 이동 삭제 → 단순히 로그만 남기고, 이후 UI 처리나 다른 로직에서 대응 가능
 	}
-}
-
-void ALMBMyGameModeBase::ShowGameOverWidget()
-{
-	if (!GameOverWidgetClass) return;
-
-	if (ActiveWidget)
-	{
-		ActiveWidget->RemoveFromParent();
-		ActiveWidget = nullptr;
-	}
-
-	ActiveWidget = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
-	if (!ActiveWidget) return;
-
-	ActiveWidget->AddToViewport();
-
-	// 버튼 바인딩
-	if (UButton* RestartButton = Cast<UButton>(ActiveWidget->GetWidgetFromName(TEXT("RestartButton"))))
-	{
-		RestartButton->OnClicked.AddDynamic(this, &ALMBMyGameModeBase::OnGoToMainMenuClicked);
-	}
-}
-
-void ALMBMyGameModeBase::OnGoToMainMenuClicked()
-{
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
-
-	// MainMenu 레벨로 이동
-	UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
+	
 }
