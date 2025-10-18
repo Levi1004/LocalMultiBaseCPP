@@ -59,6 +59,7 @@ void AActorMonsterBase::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    if (bIsDead) return;
     // --- [1] 씬에 있는 모든 플레이어 가져오기 ---
     TArray<AActor*> FoundPlayers;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALMBpawnPlayer::StaticClass(), FoundPlayers);
@@ -137,6 +138,9 @@ void AActorMonsterBase::ApplyDamage(float Damage, ALMBpawnPlayer* DamageInstigat
 
 void AActorMonsterBase::Die()
 {
+    if (bIsDead) return; // 중복 호출 방지
+    bIsDead = true;
+
     UE_LOG(LogTemp, Warning, TEXT("%s 사망"), *GetName());
 
     if (LastDamageInstigator)
@@ -144,6 +148,24 @@ void AActorMonsterBase::Die()
         LastDamageInstigator->AddExperience(ExperienceValue);
     }
 
-    Destroy();
-}
+    // 애니메이션 재생
+    if (SkeletalMeshComp && DeathAnimation)
+    {
+        SkeletalMeshComp->PlayAnimation(DeathAnimation, false);
+    }
 
+    // 콜리전 제거
+    BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    // Tick 끄기
+    SetActorTickEnabled(false);
+
+    // Destroy Timer
+    FTimerHandle TimerHandle;
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle,
+        [this]() { Destroy(); },
+        DeathAnimDelay,
+        false
+    );
+}

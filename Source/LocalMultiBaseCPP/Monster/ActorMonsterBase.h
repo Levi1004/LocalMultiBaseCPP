@@ -79,7 +79,7 @@ public:
 	FVector Direction = FVector(1, 0, 0);
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float MoveSpeed = 300.0f;
+	float MoveSpeed = 1000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxForwardDistance = 700.0f;
@@ -94,5 +94,13 @@ public:
 	
 	EMonsterMovePhase MovePhase = EMonsterMovePhase::InitialForward;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimationAsset* DeathAnimation; // AnimSequence 연결
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
+	float DeathAnimDelay = 2.f; // 애니메이션 길이에 맞춰 설정
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsDead = false;
 
 };
