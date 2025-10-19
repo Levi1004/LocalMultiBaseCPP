@@ -94,4 +94,10 @@ public:
 private:
     void FindClosestPlayer();
     void MoveTowardsPlayer(float DeltaTime);
+
+private:
+    bool bIsActive;                  // 활성화 여부
+    FTimerHandle ActivateTimerHandle; // 3분 후 활성화 타이머
+
+    void ActivateBoss();
 };

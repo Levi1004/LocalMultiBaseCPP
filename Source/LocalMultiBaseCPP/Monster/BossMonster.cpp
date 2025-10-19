@@ -14,6 +14,8 @@ ABossMonster::ABossMonster()
 {
     PrimaryActorTick.bCanEverTick = true;
 
+    bIsActive = false;
+
     GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
 
     HitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
@@ -41,11 +43,15 @@ void ABossMonster::BeginPlay()
 {
     Super::BeginPlay();
     CurrentHp = MaxHp;
+
+    GetWorldTimerManager().SetTimer(ActivateTimerHandle, this, &ABossMonster::ActivateBoss, 180.f, false);
 }
 
 void ABossMonster::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    if (!bIsActive) return; // 활성화 전에는 아무 행동도 하지 않음
     if (bIsDead) return;
 
     if (!TargetPlayer || TargetPlayer->IsDead())
@@ -100,6 +106,15 @@ void ABossMonster::MoveTowardsPlayer(float DeltaTime)
 
     FVector Direction = (TargetPlayer->GetActorLocation() - GetActorLocation()).GetSafeNormal();
     AddMovementInput(Direction, 1.0f);
+}
+
+void ABossMonster::ActivateBoss()
+{
+    bIsActive = true;
+    UE_LOG(LogTemp, Warning, TEXT("Boss is now active!"));
+
+    // 예: 공격 가능 상태로 설정
+    bCanAttack = true;
 }
 
 void ABossMonster::PerformAttack()
