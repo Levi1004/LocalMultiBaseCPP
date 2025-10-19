@@ -153,10 +153,10 @@ void ALMBpawnPlayer::ApplyMeshByPlayerIndex()
 	switch (PlayerIndex)
 	{
 	case 0:
-		SpawnLocation = FVector(3000.f, 3000.f, 100.f);
+		SpawnLocation = FVector(-12670.0f, -18620.0f, 100.f);
 		break;
 	case 1:
-		SpawnLocation = FVector(3000.f, -3000.f, 100.f);
+		SpawnLocation = FVector(-19220.0f, -13679.0f, 100.f);
 		break;
 	default:
 		//UE_LOG(LogTemp, Warning, TEXT("PlayerIndex에 해당하는 메쉬/AnimClass 없음"));
