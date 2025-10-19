@@ -61,12 +61,12 @@ void AActorMonsterBase::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     if (bIsDead) return;
-    // --- [1] 씬에 있는 모든 플레이어 가져오기 ---
+    // --- 씬에 있는 모든 플레이어 가져오기 ---
     TArray<AActor*> FoundPlayers;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALMBpawnPlayer::StaticClass(), FoundPlayers);
     if (FoundPlayers.Num() == 0) return;
 
-    // --- [2] 가장 가까운 플레이어 탐색 ---
+    // ---가장 가까운 플레이어 탐색 ---
     AActor* ClosestPlayer = nullptr;
     float ClosestDistSq = FLT_MAX;
     FVector MyLocation = GetActorLocation();
@@ -83,7 +83,7 @@ void AActorMonsterBase::Tick(float DeltaTime)
 
     if (!ClosestPlayer) return;
 
-    // --- [3] 가장 가까운 플레이어 방향으로 이동 ---
+    // --- 가장 가까운 플레이어 방향으로 이동 ---
     FVector ToPlayer = (ClosestPlayer->GetActorLocation() - MyLocation);
     ToPlayer.Z = 0; // Yaw 회전만 적용
     FVector MoveDir = ToPlayer.GetSafeNormal();
@@ -102,8 +102,8 @@ void AActorMonsterBase::Tick(float DeltaTime)
         }
     }
 
-    // --- [4] 디버그 시각화 ---
-    DrawDebugLine(GetWorld(), MyLocation, ClosestPlayer->GetActorLocation(), FColor::Red, false, -1.f, 0, 2.f);
+    // --- 디버그 시각화 ---
+   // DrawDebugLine(GetWorld(), MyLocation, ClosestPlayer->GetActorLocation(), FColor::Red, false, -1.f, 0, 2.f);
 }
 
 void AActorMonsterBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

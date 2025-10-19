@@ -69,8 +69,8 @@
      }
 
      // 디버그용: SphereTrace 위치와 반경 시각화 (캐릭터 바로 앞쪽)
-     FVector SphereCenter = Start + OwnerActor->GetActorForwardVector() * (TraceDistance / 2);
-     DrawDebugSphere(
+    // FVector SphereCenter = Start + OwnerActor->GetActorForwardVector() * (TraceDistance / 2);
+     /*DrawDebugSphere(
          OwnerActor->GetWorld(),
          SphereCenter,
          TraceRadius,
@@ -78,8 +78,8 @@
          FColor::Red,
          false,
          2.f
-     );
+     );*/
 
      // 공격 라인 디버그 (선으로 확인용)
-     DrawDebugLine(OwnerActor->GetWorld(), Start, End, FColor::Green, false, 2.f, 0, 5.f);
+    // DrawDebugLine(OwnerActor->GetWorld(), Start, End, FColor::Green, false, 2.f, 0, 5.f);
  }

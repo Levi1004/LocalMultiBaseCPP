@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Blueprint/UserWidget.h"
 #include "BossMonster.generated.h"
 
 class UBoxComponent;
@@ -93,8 +94,6 @@ public:
     UFUNCTION()
     void ResetAttack();
 
-
-
 private:
     void FindClosestPlayer();
     void MoveTowardsPlayer(float DeltaTime);
@@ -104,4 +103,9 @@ private:
     FTimerHandle ActivateTimerHandle; // 3분 후 활성화 타이머
 
     void ActivateBoss();
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+    TSubclassOf<UUserWidget> GameClearWidgetClass;
+
+    UUserWidget* GameClearWidget;
 };

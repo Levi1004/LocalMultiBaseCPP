@@ -80,7 +80,7 @@ void ABossMonster::Tick(float DeltaTime)
             MoveTowardsPlayer(DeltaTime);
         }
 
-        DrawDebugLine(GetWorld(), GetActorLocation(), TargetPlayer->GetActorLocation(), FColor::Green, false, 0.1f, 0, 2.0f);
+       // DrawDebugLine(GetWorld(), GetActorLocation(), TargetPlayer->GetActorLocation(), FColor::Green, false, 0.1f, 0, 2.0f);
     }
 }
 
@@ -149,7 +149,7 @@ void ABossMonster::PerformAttack()
 
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_GameTraceChannel1, Params);
 
-    DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 1.0f, 0, 5.0f);
+   // DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 1.0f, 0, 5.0f);
 
     if (bHit)
     {
@@ -180,6 +180,13 @@ void ABossMonster::ResetAttack()
 
 void ABossMonster::ApplyDamage(float Damage, ALMBpawnPlayer* DamageInstigator)
 {
+    // 아직 활성화되지 않았다면 무적 상태
+    if (!bIsActive)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("%s 은(는) 아직 활성화되지 않아 무적입니다!"), *GetName());
+        return;
+    }
+
     if (Damage <= 0.f || CurrentHp <= 0.f) return;
 
     CurrentHp -= Damage;
@@ -190,7 +197,6 @@ void ABossMonster::ApplyDamage(float Damage, ALMBpawnPlayer* DamageInstigator)
         Die();
     }
 }
-
 void ABossMonster::Die()
 {
     if (bIsDead) return;
@@ -214,9 +220,34 @@ void ABossMonster::Die()
     AliveBossCount--;
     if (AliveBossCount <= 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("모든 보스 처치! 게임 클리어!"));
-        // 게임 클리어 로직 추가 가능
-        // 예: UGameplayStatics::OpenLevel(GetWorld(), "VictoryLevel");
+        UE_LOG(LogTemp, Warning, TEXT("모든 보스 처치! 3초 뒤 게임 클리어 UI 표시 예정"));
+
+        // 3초 뒤 게임 클리어 위젯 표시
+        FTimerHandle GameClearTimerHandle;
+        GetWorldTimerManager().SetTimer(
+            GameClearTimerHandle,
+            [this]()
+            {
+                if (GameClearWidgetClass)
+                {
+                    GameClearWidget = CreateWidget<UUserWidget>(GetWorld(), GameClearWidgetClass);
+                    if (GameClearWidget)
+                    {
+                        GameClearWidget->AddToViewport();
+
+                        if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+                        {
+                            FInputModeUIOnly InputMode;
+                            InputMode.SetWidgetToFocus(GameClearWidget->TakeWidget());
+                            PC->SetInputMode(InputMode);
+                            PC->bShowMouseCursor = true;
+                        }
+                    }
+                }
+            },
+            5.0f,  
+            false
+        );
     }
 
     SetLifeSpan(3.5f);

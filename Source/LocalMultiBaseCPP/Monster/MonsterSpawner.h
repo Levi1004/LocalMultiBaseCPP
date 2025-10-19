@@ -48,6 +48,9 @@ public:
     UPROPERTY(VisibleAnywhere)
     UStaticMeshComponent* MeshComp;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
+    float MaxSpawnDuration = 180.f;
+
 private:
     // 내부 관리용
     float CurrentTime = 0.0f;

@@ -49,7 +49,7 @@ ALMBpawnBase::ALMBpawnBase()
     SpringArmComp->SetupAttachment(RootComponent);
     SpringArmComp->SetUsingAbsoluteRotation(false);
 	SpringArmComp->SetRelativeLocation(FVector(0.f, 0.f, 150.f));
-    SpringArmComp->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
+    SpringArmComp->SetRelativeRotation(FRotator(-33.f, 0.f, 0.f));
     SpringArmComp->TargetArmLength = 10000.0f;
     SpringArmComp->bUsePawnControlRotation = false;
 	SpringArmComp->bDoCollisionTest = false;

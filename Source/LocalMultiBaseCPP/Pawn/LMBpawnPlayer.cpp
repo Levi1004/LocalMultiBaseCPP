@@ -31,13 +31,13 @@ void ALMBpawnPlayer::InitializePlayerStats(int32 InPlayerIndex)
 	case 0: // 1P
 		PlayerName = TEXT("Warrior1");
 		MaxHealth = 200.f;
-		AttackPower = 500.f;
+		AttackPower = 10.f;
 		Defence = 5.f;
 		break;
 	case 1: // 2P
 		PlayerName = TEXT("Warrior2");
 		MaxHealth = 200.f;
-		AttackPower = 25.f;
+		AttackPower = 10.f;
 		Defence = 5.f;
 		break;
 	default:

@@ -59,18 +59,27 @@ void AMonsterSpawner::BeginPlay()
 // Called every frame
 void AMonsterSpawner::Tick(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
-	
+	Super::Tick(DeltaTime);
 
+	// 이미 Destroy된 몬스터 제거
 	for (int32 i = SpawnedMonsters.Num() - 1; i >= 0; --i)
 	{
-		if (!IsValid(SpawnedMonsters[i])) // 이미 Destroy된 경우
+		if (!IsValid(SpawnedMonsters[i]))
 		{
 			SpawnedMonsters.RemoveAt(i);
 		}
 	}
 
+	// 누적 시간 증가
 	CurrentTime += DeltaTime;
+
+	// 3분(180초) 지나면 스폰 중단
+	if (CurrentTime >= MaxSpawnDuration)
+	{
+		return; // 더 이상 스폰하지 않음
+	}
+
+	// DelayTime마다 스폰
 	if (CurrentTime >= DelayTime && SpawnedMonsters.Num() < MaxSpawnCount)
 	{
 		CurrentTime = 0.f;
@@ -85,21 +94,18 @@ void AMonsterSpawner::Tick(float DeltaTime)
 			{
 				SpawnedMonsters.Add(NewMonster);
 
-				// 전방 이동만 지정
 				NewMonster->StartLocation = SpawnLocation;
-				NewMonster->Direction = FVector(1, 0, 0); 
+				NewMonster->Direction = FVector(1, 0, 0);
 				NewMonster->MovePhase = EMonsterMovePhase::InitialForward;
 				NewMonster->bHasReachedDistance = false;
 
 				NewMonster->Hp = FMath::RoundToInt(NewMonster->Hp * SpawnedMonsterHpMultiplier);
 				NewMonster->AttackPower = FMath::RoundToInt(NewMonster->AttackPower * SpawnedMonsterAttackMultiplier);
 
-
 				NewMonster->OnDestroyed.AddDynamic(this, &AMonsterSpawner::OnMonsterDestroyed);
 			}
 		}
 	}
-	
 }
 void AMonsterSpawner::OnMonsterDestroyed(AActor* DestroyedActor)
 {
