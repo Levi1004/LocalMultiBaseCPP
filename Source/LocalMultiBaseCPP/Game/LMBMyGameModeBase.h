@@ -2,14 +2,15 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Pawn/LMBpawnPlayer.h"
+#include "GameFramework/PlayerStart.h"
 #include "LMBMyGameModeBase.generated.h"
 
-/**
- * 
- */
+class ALMBPlayerController;
+
 UCLASS()
 class LOCALMULTIBASECPP_API ALMBMyGameModeBase : public AGameModeBase
 {
@@ -25,15 +26,14 @@ private:
 	int32 MaxPlayerIndex = 2;
 	int32 CurrentPlayerIndex = 0;
 
-protected:
-	UPROPERTY(VisibleAnywhere, Category = "PlayerStat")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	TArray<FName> PlayerStartTags = { TEXT("Start1P"), TEXT("Start2P") };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	TSubclassOf<class ALMBpawnPlayer> BP_PlayerClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ALMBpawnPlayer> BP_PlayerClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	TSubclassOf<class ALMBpawnPlayer> LMBpawnPlayerClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ALMBpawnPlayer> LMBpawnPlayerClass;
 
 private:
 	APlayerStart* FindPlayerStart(UWorld* CurrentWorld, const FName& TargetTag);
@@ -43,6 +43,8 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable)
-void DestroyAllPawnsBeforeLevelChange();
+	void DestroyAllPawnsBeforeLevelChange();
 
+	UFUNCTION(BlueprintCallable)
+	void DestroyExtraLocalPlayers(); // 첫 번째 제외
 };

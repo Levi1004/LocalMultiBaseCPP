@@ -3,9 +3,7 @@
 
 #include "Game/LMBMyGameModeBase.h"
 #include "Player/LMBPlayerController.h"
-#include "Pawn/LMBpawnPlayer.h"
 #include "EngineUtils.h"
-#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/GameInstance.h"
 
@@ -20,34 +18,34 @@ void ALMBMyGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UWorld* CurrentWorld = GetWorld();
-	if (!CurrentWorld) return;
+	UWorld* World = GetWorld();
+	if (!World) return;
 
-	for (int32 i = 0; i < MaxPlayerIndex; i++)
+	// 기존 Pawn 제거
+	DestroyAllPawnsBeforeLevelChange();
+
+	// 추가 LocalPlayer 제거 (첫 번째 PlayerController 제외)
+	DestroyExtraLocalPlayers();
+
+	CurrentPlayerIndex = 0;
+
+	for (int32 i = 0; i < MaxPlayerIndex; ++i)
 	{
-		APlayerStart* FoundStart = FindPlayerStart(CurrentWorld, PlayerStartTags[i]);
-		if (FoundStart)
-		{
-			SpawnLocalPlayer(CurrentWorld, FoundStart);
-		}
+		APlayerStart* Start = FindPlayerStart(World, PlayerStartTags.IsValidIndex(i) ? PlayerStartTags[i] : NAME_None);
+		if (Start)
+			SpawnLocalPlayer(World, Start);
 		else
-		{
 			UE_LOG(LogTemp, Warning, TEXT("PlayerStart with tag %s not found!"), *PlayerStartTags[i].ToString());
-		}
 	}
 }
 
-APlayerStart* ALMBMyGameModeBase::FindPlayerStart(UWorld* CurrentWorld, const FName& TargetTag)
+APlayerStart* ALMBMyGameModeBase::FindPlayerStart(UWorld* World, const FName& TargetTag)
 {
-	if (!CurrentWorld) return nullptr;
-
-	for (TActorIterator<APlayerStart> It(CurrentWorld); It; ++It)
+	for (TActorIterator<APlayerStart> It(World); It; ++It)
 	{
 		APlayerStart* Start = *It;
 		if (Start && Start->PlayerStartTag == TargetTag)
-		{
 			return Start;
-		}
 	}
 	return nullptr;
 }
@@ -56,81 +54,98 @@ void ALMBMyGameModeBase::SpawnLocalPlayer(UWorld* World, APlayerStart* PlayerSta
 {
 	if (!World || !PlayerStart) return;
 
-	APlayerController* PlayerController = nullptr;
+	APlayerController* PC = nullptr;
 
 	if (CurrentPlayerIndex == 0)
 	{
-		PlayerController = World->GetFirstPlayerController();
+		PC = World->GetFirstPlayerController();
 	}
 	else
 	{
-		PlayerControllerClass = APlayerController::StaticClass();
-		ULocalPlayer* NewLocalPlayer = CreateLocalPlayer();
-		PlayerController = NewLocalPlayer ? NewLocalPlayer->GetPlayerController(World) : nullptr;
+		ULocalPlayer* NewLP = CreateLocalPlayer();
+		if (NewLP)
+			PC = NewLP->GetPlayerController(World);
 	}
 
-	if (!PlayerController) return;
+	if (!PC) return;
 
-	// 기존 Pawn 제거
-	if (APawn* ExistingPawn = PlayerController->GetPawn())
-	{
-		ExistingPawn->Destroy();
-	}
+	if (APawn* Existing = PC->GetPawn())
+		Existing->Destroy();
 
-	SpawnAndPossessPawn(World, PlayerStart, PlayerController);
+	SpawnAndPossessPawn(World, PlayerStart, PC);
 	CurrentPlayerIndex++;
 }
 
 ULocalPlayer* ALMBMyGameModeBase::CreateLocalPlayer()
 {
-	UGameInstance* GameInstance = GetGameInstance();
-	if (!GameInstance) return nullptr;
+	UGameInstance* GI = GetGameInstance();
+	if (!GI) return nullptr;
 
 	FString Error;
-	return GameInstance->CreateLocalPlayer(-1, Error, true);
+	return GI->CreateLocalPlayer(-1, Error, true);
 }
 
-ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerStart* PlayerStart, APlayerController* PlayerController)
+ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerStart* Start, APlayerController* PC)
 {
-	if (!World || !PlayerStart || !PlayerController) return nullptr;
+	if (!World || !Start || !PC) return nullptr;
 
 	TSubclassOf<ALMBpawnPlayer> ClassToSpawn = BP_PlayerClass ? BP_PlayerClass : LMBpawnPlayerClass;
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Name = FName(*FString::Printf(TEXT("PlayerPawn%d"), CurrentPlayerIndex));
+	FActorSpawnParameters Params;
+	Params.Name = FName(*FString::Printf(TEXT("PlayerPawn%d"), CurrentPlayerIndex));
 
-	ALMBpawnPlayer* NewPawn = World->SpawnActor<ALMBpawnPlayer>(
+	ALMBpawnPlayer* Pawn = World->SpawnActor<ALMBpawnPlayer>(
 		ClassToSpawn,
-		PlayerStart->GetActorLocation(),
-		PlayerStart->GetActorRotation(),
-		SpawnParams
+		Start->GetActorLocation(),
+		Start->GetActorRotation(),
+		Params
 	);
 
-	if (!NewPawn)
+	if (!Pawn)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Pawn spawn failed for player %d"), CurrentPlayerIndex);
 		return nullptr;
 	}
 
-	NewPawn->SetPlayerIndex(CurrentPlayerIndex);
-	NewPawn->InitializePlayerStats(CurrentPlayerIndex);
-	PlayerController->Possess(NewPawn);
+	Pawn->SetPlayerIndex(CurrentPlayerIndex);
+	Pawn->InitializePlayerStats(CurrentPlayerIndex);
 
-	UE_LOG(LogTemp, Warning, TEXT("%dP (%s) spawned."), CurrentPlayerIndex + 1, *NewPawn->GetName());
-	return NewPawn;
+	PC->Possess(Pawn);
+
+	UE_LOG(LogTemp, Warning, TEXT("%dP (%s) spawned."), CurrentPlayerIndex + 1, *Pawn->GetName());
+	return Pawn;
 }
 
 void ALMBMyGameModeBase::DestroyAllPawnsBeforeLevelChange()
 {
-	  UWorld* World = GetWorld();
-    if (!World) return;
+	UWorld* World = GetWorld();
+	if (!World) return;
 
-    TArray<AActor*> FoundPawns;
-    UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), FoundPawns);
+	TArray<AActor*> FoundPawns;
+	UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), FoundPawns);
 
-    for (AActor* Actor : FoundPawns)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("이전 Pawn 제거: %s"), *Actor->GetName());
-        Actor->Destroy();
-    }
+	for (AActor* Actor : FoundPawns)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("이전 Pawn 제거: %s"), *Actor->GetName());
+		Actor->Destroy();
+	}
+}
+
+void ALMBMyGameModeBase::DestroyExtraLocalPlayers()
+{
+	UGameInstance* GI = GetGameInstance();
+	if (!GI) return;
+
+	TArray<ULocalPlayer*> LocalPlayersCopy = GI->GetLocalPlayers();
+	for (int32 i = LocalPlayersCopy.Num() - 1; i >= 1; --i)
+	{
+		if (ULocalPlayer* LP = LocalPlayersCopy[i])
+		{
+			if (LP->PlayerController)
+				LP->PlayerController->UnPossess();
+
+			GI->RemoveLocalPlayer(LP);
+			UE_LOG(LogTemp, Warning, TEXT("LocalPlayer 제거: %d"), i);
+		}
+	}
 }
