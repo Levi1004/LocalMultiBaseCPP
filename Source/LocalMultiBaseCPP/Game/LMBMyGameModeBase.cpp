@@ -8,6 +8,7 @@
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
+#include "Monster/BossMonster.h"
 
 ALMBMyGameModeBase::ALMBMyGameModeBase()
 {
@@ -133,6 +134,10 @@ void ALMBMyGameModeBase::DestroyAllPawnsBeforeLevelChange()
 
 	for (AActor* Actor : FoundPawns)
 	{
+		// 보스는 제거하지 않음
+		if (Actor->IsA(ABossMonster::StaticClass()))
+			continue;
+
 		UE_LOG(LogTemp, Warning, TEXT("이전 Pawn 제거: %s"), *Actor->GetName());
 		Actor->Destroy();
 	}
