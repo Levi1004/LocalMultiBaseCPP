@@ -9,6 +9,9 @@
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/World.h"
+
+int32 ABossMonster::AliveBossCount = 0; // 정적 변수 초기화
 
 ABossMonster::ABossMonster()
 {
@@ -44,14 +47,18 @@ void ABossMonster::BeginPlay()
     Super::BeginPlay();
     CurrentHp = MaxHp;
 
+    // 보스 활성화 3분 타이머
     GetWorldTimerManager().SetTimer(ActivateTimerHandle, this, &ABossMonster::ActivateBoss, 180.f, false);
+
+    // 보스 카운트 증가
+    AliveBossCount++;
 }
 
 void ABossMonster::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (!bIsActive) return; // 활성화 전에는 아무 행동도 하지 않음
+    if (!bIsActive) return;
     if (bIsDead) return;
 
     if (!TargetPlayer || TargetPlayer->IsDead())
@@ -64,7 +71,6 @@ void ABossMonster::Tick(float DeltaTime)
     {
         float Distance = FVector::Dist(GetActorLocation(), TargetPlayer->GetActorLocation());
 
-        // 플레이어가 공격 사거리 안에 있으면 공격
         if (Distance <= AttackRange)
         {
             PerformAttack();
@@ -74,7 +80,6 @@ void ABossMonster::Tick(float DeltaTime)
             MoveTowardsPlayer(DeltaTime);
         }
 
-        // 디버그 라인 표시
         DrawDebugLine(GetWorld(), GetActorLocation(), TargetPlayer->GetActorLocation(), FColor::Green, false, 0.1f, 0, 2.0f);
     }
 }
@@ -112,8 +117,6 @@ void ABossMonster::ActivateBoss()
 {
     bIsActive = true;
     UE_LOG(LogTemp, Warning, TEXT("Boss is now active!"));
-
-    // 예: 공격 가능 상태로 설정
     bCanAttack = true;
 }
 
@@ -127,7 +130,6 @@ void ABossMonster::PerformAttack()
 
     UE_LOG(LogTemp, Warning, TEXT("BossMonster is Attacking!"));
 
-    // 공격 애니메이션 재생
     if (AttackMontages.Num() > 0)
     {
         int32 Index = FMath::RandRange(0, AttackMontages.Num() - 1);
@@ -138,9 +140,8 @@ void ABossMonster::PerformAttack()
         }
     }
 
-    // 라인트레이스 공격 판정
     FHitResult HitResult;
-    FVector Start = GetActorLocation() + FVector(0, 0, -1500);  // 캐릭터 중심보다 살짝 위
+    FVector Start = GetActorLocation() + FVector(0, 0, -1500);
     FVector End = Start + GetActorForwardVector() * AttackRange;
 
     FCollisionQueryParams Params;
@@ -148,17 +149,7 @@ void ABossMonster::PerformAttack()
 
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_GameTraceChannel1, Params);
 
-    // 디버그 라인 표시 (히트 여부에 따라 색상)
-    DrawDebugLine(
-        GetWorld(),
-        Start,
-        End,
-        bHit ? FColor::Red : FColor::Green,
-        false,       // 일시적 표시
-        1.0f,        // 1초 동안 표시
-        0,
-        5.0f         // 선 두께
-    );
+    DrawDebugLine(GetWorld(), Start, End, bHit ? FColor::Red : FColor::Green, false, 1.0f, 0, 5.0f);
 
     if (bHit)
     {
@@ -178,9 +169,9 @@ void ABossMonster::PerformAttack()
         }
     }
 
-    // 공격 쿨다운
     GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABossMonster::ResetAttack, AttackCooldown, false);
 }
+
 void ABossMonster::ResetAttack()
 {
     bCanAttack = true;
@@ -217,6 +208,15 @@ void ABossMonster::Die()
         {
             AnimInstance->Montage_Play(DeathMontage);
         }
+    }
+
+    // 보스 카운트 감소
+    AliveBossCount--;
+    if (AliveBossCount <= 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("모든 보스 처치! 게임 클리어!"));
+        // 게임 클리어 로직 추가 가능
+        // 예: UGameplayStatics::OpenLevel(GetWorld(), "VictoryLevel");
     }
 
     SetLifeSpan(3.5f);

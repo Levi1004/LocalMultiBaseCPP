@@ -18,6 +18,8 @@ class LOCALMULTIBASECPP_API ABossMonster : public ACharacter
 public:
     ABossMonster();
 
+    static int32 AliveBossCount;
+
 protected:
     virtual void BeginPlay() override;
 
@@ -90,6 +92,8 @@ public:
 
     UFUNCTION()
     void ResetAttack();
+
+
 
 private:
     void FindClosestPlayer();
