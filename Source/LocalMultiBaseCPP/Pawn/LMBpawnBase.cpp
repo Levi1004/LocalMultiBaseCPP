@@ -8,6 +8,8 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Game/LMBMyGameModeBase.h"
 #include "Animation/LMBAnimInstance.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -69,6 +71,13 @@ void ALMBpawnBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	int32 PawnCount = 0;
+	for (TActorIterator<APawn> It(GetWorld()); It; ++It)
+	{
+		PawnCount++;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("=== [GameMode BeginPlay] 현재 Pawn 개수: %d ==="), PawnCount);
 }
 
 // -----------------------------
@@ -93,6 +102,7 @@ void ALMBpawnBase::OnInputMove(const FVector2D& MoveVector)
         AddMovementInput(Forward, MoveVector.X);
     }
 }
+
 // Optional: Tick에서 회전 보간 적용 가능
 void ALMBpawnBase::Tick(float DeltaTime)
 {
@@ -125,10 +135,6 @@ float ALMBpawnBase::TakeDamage(
 void ALMBpawnBase::Die()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s has died"), *GetName());
-	if (ALMBMyGameModeBase* GM = Cast<ALMBMyGameModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		GM->CheckGameOver();
-	}
 
 	Destroy();
 }
@@ -136,3 +142,4 @@ void ALMBpawnBase::ApplyMeshByPlayerIndex()
 {
 	UE_LOG(LogTemp, Warning, TEXT("ALMBpawnBase::ApplyMeshByPlayerIndex() 호출"));
 }
+

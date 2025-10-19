@@ -42,6 +42,7 @@ private:
 	ALMBpawnPlayer* SpawnAndPossessPawn(UWorld* World, APlayerStart* PlayerStart, APlayerController* PlayerController);
 
 public:
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CheckGameOver();
+	UFUNCTION(BlueprintCallable)
+void DestroyAllPawnsBeforeLevelChange();
+
 };

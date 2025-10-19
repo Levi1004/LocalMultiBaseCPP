@@ -120,25 +120,17 @@ ALMBpawnPlayer* ALMBMyGameModeBase::SpawnAndPossessPawn(UWorld* World, APlayerSt
 	return NewPawn;
 }
 
-void ALMBMyGameModeBase::CheckGameOver_Implementation()
+void ALMBMyGameModeBase::DestroyAllPawnsBeforeLevelChange()
 {
-	bool bAllDead = true;
+	  UWorld* World = GetWorld();
+    if (!World) return;
 
-	for (TActorIterator<ALMBpawnPlayer> It(GetWorld()); It; ++It)
-	{
-		ALMBpawnPlayer* Player = *It;
-		if (Player && !Player->IsDead())
-		{
-			bAllDead = false;
-			break;
-		}
-	}
+    TArray<AActor*> FoundPawns;
+    UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), FoundPawns);
 
-	if (bAllDead)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("게임 오버! 모든 플레이어 사망"));
-
-		// 레벨 이동 삭제 → 단순히 로그만 남기고, 이후 UI 처리나 다른 로직에서 대응 가능
-	}
-	
+    for (AActor* Actor : FoundPawns)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("이전 Pawn 제거: %s"), *Actor->GetName());
+        Actor->Destroy();
+    }
 }
