@@ -8,31 +8,28 @@
 #include "Animation/AnimInstance.h"
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
+#include "Components/CapsuleComponent.h"
 
 ABossMonster::ABossMonster()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    // 1. RootComponent 설정 (HitBox)
+    GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
+
     HitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
-    SetRootComponent(HitBox);
+    HitBox->SetupAttachment(GetRootComponent());
     HitBox->SetBoxExtent(FVector(100.f, 100.f, 100.f));
     HitBox->SetRelativeLocation(FVector(50.f, 0.f, 50.f));
 
-    // 2. Mesh 설정
-    USkeletalMeshComponent* MeshComp = GetMesh();
-    MeshComp->SetupAttachment(HitBox); // RootComponent에 Attach
-    MeshComp->SetRelativeLocation(FVector(0.f, 0.f, -90.f));
-    MeshComp->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+    GetMesh()->SetupAttachment(GetCapsuleComponent());
+    GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -90.f));
+    GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
-    // 3. 이동 설정
     GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
     bUseControllerRotationYaw = false;
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
 
-    // 4. 초기 상태
     CurrentHp = MaxHp;
     bCanAttack = true;
     bIsAttacking = false;
@@ -49,10 +46,8 @@ void ABossMonster::BeginPlay()
 void ABossMonster::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
     if (bIsDead) return;
 
-    // 타겟 없으면 탐색
     if (!TargetPlayer || TargetPlayer->IsDead())
     {
         TargetPlayer = nullptr;
@@ -60,7 +55,22 @@ void ABossMonster::Tick(float DeltaTime)
     }
 
     if (TargetPlayer && !bIsDead)
-        MoveTowardsPlayer(DeltaTime);
+    {
+        float Distance = FVector::Dist(GetActorLocation(), TargetPlayer->GetActorLocation());
+
+        // 플레이어가 공격 사거리 안에 있으면 공격
+        if (Distance <= AttackRange)
+        {
+            PerformAttack();
+        }
+        else
+        {
+            MoveTowardsPlayer(DeltaTime);
+        }
+
+        // 디버그 라인 표시
+        DrawDebugLine(GetWorld(), GetActorLocation(), TargetPlayer->GetActorLocation(), FColor::Green, false, 0.1f, 0, 2.0f);
+    }
 }
 
 void ABossMonster::FindClosestPlayer()
@@ -88,25 +98,10 @@ void ABossMonster::MoveTowardsPlayer(float DeltaTime)
 {
     if (!TargetPlayer || bIsAttacking) return;
 
-    FVector MyLocation = GetActorLocation();
-    FVector TargetLocation = TargetPlayer->GetActorLocation();
-    float Distance = FVector::Dist(MyLocation, TargetLocation);
-
-    if (Distance <= AttackRange)
-    {
-        PerformAttack();
-        return;
-    }
-
-    // 이동 방향 계산
-    FVector Direction = (TargetLocation - MyLocation).GetSafeNormal();
+    FVector Direction = (TargetPlayer->GetActorLocation() - GetActorLocation()).GetSafeNormal();
     AddMovementInput(Direction, 1.0f);
-
-    // 디버그 라인
-    DrawDebugLine(GetWorld(), MyLocation, TargetLocation, FColor::Green, false, 0.1f, 0, 2.0f);
 }
 
-// 공격, 회전 및 데미지 로직은 기존 ApplyDamage 방식 그대로 사용
 void ABossMonster::PerformAttack()
 {
     if (!bCanAttack || bIsAttacking || !TargetPlayer || bIsDead || TargetPlayer->IsDead())
@@ -114,6 +109,8 @@ void ABossMonster::PerformAttack()
 
     bCanAttack = false;
     bIsAttacking = true;
+
+    UE_LOG(LogTemp, Warning, TEXT("BossMonster is Attacking!"));
 
     // 공격 애니메이션 재생
     if (AttackMontages.Num() > 0)
@@ -126,15 +123,28 @@ void ABossMonster::PerformAttack()
         }
     }
 
-    // 데미지 판정 (라인 트레이스)
+    // 라인트레이스 공격 판정
     FHitResult HitResult;
-    FVector Start = GetActorLocation();
+    FVector Start = GetActorLocation() + FVector(0, 0, -1500);  // 캐릭터 중심보다 살짝 위
     FVector End = Start + GetActorForwardVector() * AttackRange;
 
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
-    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Pawn, Params);
+
+    // 디버그 라인 표시 (히트 여부에 따라 색상)
+    DrawDebugLine(
+        GetWorld(),
+        Start,
+        End,
+        bHit ? FColor::Red : FColor::Green,
+        false,       // 일시적 표시
+        1.0f,        // 1초 동안 표시
+        0,
+        5.0f         // 선 두께
+    );
+
     if (bHit)
     {
         if (ALMBpawnPlayer* HitPlayer = Cast<ALMBpawnPlayer>(HitResult.GetActor()))
@@ -142,18 +152,18 @@ void ABossMonster::PerformAttack()
             float Damage = AttackDamage;
             if (AttackDamages.Num() > 0)
             {
-                int32 Index = FMath::Clamp(FMath::RandRange(0, AttackDamages.Num() - 1), 0, AttackDamages.Num() - 1);
+                int32 Index = FMath::RandRange(0, AttackDamages.Num() - 1);
                 Damage = AttackDamages[Index];
             }
 
+            UE_LOG(LogTemp, Warning, TEXT("Boss hit %s for %f damage!"), *HitPlayer->GetName(), Damage);
             HitPlayer->ApplyDamage(Damage, this);
         }
     }
 
-    // 공격 쿨다운 후 ResetAttack 호출
+    // 공격 쿨다운
     GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABossMonster::ResetAttack, AttackCooldown, false);
 }
-
 void ABossMonster::ResetAttack()
 {
     bCanAttack = true;
@@ -175,17 +185,14 @@ void ABossMonster::ApplyDamage(float Damage, ALMBpawnPlayer* DamageInstigator)
 
 void ABossMonster::Die()
 {
-    if (bIsDead) return; // 중복 호출 방지
+    if (bIsDead) return;
 
     bIsDead = true;
-
     UE_LOG(LogTemp, Warning, TEXT("BossMonster %s has died."), *GetName());
 
-    // 공격/이동 중지
     bCanAttack = false;
     bIsAttacking = false;
 
-    // 죽음 애니메이션 재생
     if (DeathMontage)
     {
         UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -195,6 +202,5 @@ void ABossMonster::Die()
         }
     }
 
-    // 일정 시간 후 삭제
     SetLifeSpan(3.5f);
 }

@@ -47,7 +47,7 @@ public:
     float MoveSpeed = 300.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Attack")
-    float AttackRange = 500.f;
+    float AttackRange = 4500.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Attack")
     float AttackDamage = 30.f;
