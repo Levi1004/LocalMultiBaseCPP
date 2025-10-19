@@ -14,30 +14,29 @@ ABossMonster::ABossMonster()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    // HitBox
+    // 1. RootComponent 설정 (HitBox)
     HitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
-    HitBox->SetupAttachment(RootComponent);
+    SetRootComponent(HitBox);
     HitBox->SetBoxExtent(FVector(100.f, 100.f, 100.f));
     HitBox->SetRelativeLocation(FVector(50.f, 0.f, 50.f));
 
-    // SkeletalMesh
+    // 2. Mesh 설정
     USkeletalMeshComponent* MeshComp = GetMesh();
-    MeshComp->SetupAttachment(RootComponent);
+    MeshComp->SetupAttachment(HitBox); // RootComponent에 Attach
     MeshComp->SetRelativeLocation(FVector(0.f, 0.f, -90.f));
     MeshComp->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
-    // 이동 속도
+    // 3. 이동 설정
     GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+    bUseControllerRotationYaw = false;
+    GetCharacterMovement()->bOrientRotationToMovement = true;
+    GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
 
-    // 자동 회전 설정
-    bUseControllerRotationYaw = false;                        // 컨트롤러 Yaw 회전 비활성
-    GetCharacterMovement()->bOrientRotationToMovement = true; // 이동 방향으로 회전
-    GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f); // 회전 속도
-
-    // 초기화
+    // 4. 초기 상태
     CurrentHp = MaxHp;
     bCanAttack = true;
     bIsAttacking = false;
+    bIsDead = false;
     TargetPlayer = nullptr;
 }
 
@@ -49,26 +48,20 @@ void ABossMonster::BeginPlay()
 
 void ABossMonster::Tick(float DeltaTime)
 {
-
     Super::Tick(DeltaTime);
 
-    if (bIsDead) return; // 죽으면 아무것도 안 함
+    if (bIsDead) return;
 
-    // 타겟이 없거나 죽어있으면 새 타겟 탐색
+    // 타겟 없으면 탐색
     if (!TargetPlayer || TargetPlayer->IsDead())
     {
         TargetPlayer = nullptr;
         FindClosestPlayer();
     }
 
-    // 타겟이 있으면 이동 및 공격 처리
     if (TargetPlayer && !bIsDead)
-    {
-        // 이동 및 공격은 MoveTowardsPlayer에서 처리
         MoveTowardsPlayer(DeltaTime);
-    }
 }
-
 
 void ABossMonster::FindClosestPlayer()
 {

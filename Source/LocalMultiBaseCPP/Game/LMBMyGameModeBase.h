@@ -50,7 +50,8 @@ public:
 
 public:
 	void NotifyPlayerDied(class ALMBpawnBase* DeadPawn);
-
+	
+	UFUNCTION(BlueprintImplementableEvent, Category = "GameOver")
 	void OnGameOver();
 
 	TArray<ALMBpawnBase*> AlivePlayers;

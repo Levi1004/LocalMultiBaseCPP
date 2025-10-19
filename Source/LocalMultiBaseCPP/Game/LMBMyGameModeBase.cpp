@@ -166,9 +166,3 @@ void ALMBMyGameModeBase::NotifyPlayerDied(ALMBpawnBase* DeadPawn)
 		OnGameOver();
 	}
 }
-void ALMBMyGameModeBase::OnGameOver()
-{
-	UE_LOG(LogTemp, Warning, TEXT("=== 게임오버 ==="));
-
-
-}
