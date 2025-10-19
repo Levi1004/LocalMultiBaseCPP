@@ -47,4 +47,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DestroyExtraLocalPlayers(); // 첫 번째 제외
+
+public:
+	void NotifyPlayerDied(class ALMBpawnBase* DeadPawn);
+
+	void OnGameOver();
+
+	TArray<ALMBpawnBase*> AlivePlayers;
 };

@@ -5,6 +5,8 @@
 #include "Player/LMBPlayerController.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
+#include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
 
 ALMBMyGameModeBase::ALMBMyGameModeBase()
@@ -72,7 +74,12 @@ void ALMBMyGameModeBase::SpawnLocalPlayer(UWorld* World, APlayerStart* PlayerSta
 	if (APawn* Existing = PC->GetPawn())
 		Existing->Destroy();
 
-	SpawnAndPossessPawn(World, PlayerStart, PC);
+	ALMBpawnPlayer* Pawn = SpawnAndPossessPawn(World, PlayerStart, PC);
+	if (Pawn)
+	{
+		AlivePlayers.Add(Pawn);  // 살아있는 배열에 추가
+	}
+
 	CurrentPlayerIndex++;
 }
 
@@ -148,4 +155,20 @@ void ALMBMyGameModeBase::DestroyExtraLocalPlayers()
 			UE_LOG(LogTemp, Warning, TEXT("LocalPlayer 제거: %d"), i);
 		}
 	}
+}
+
+void ALMBMyGameModeBase::NotifyPlayerDied(ALMBpawnBase* DeadPawn)
+{
+	AlivePlayers.Remove(DeadPawn);
+	UE_LOG(LogTemp, Warning, TEXT("남은 플레이어 수: %d"), AlivePlayers.Num());
+	if (AlivePlayers.Num() <= 0)
+	{
+		OnGameOver();
+	}
+}
+void ALMBMyGameModeBase::OnGameOver()
+{
+	UE_LOG(LogTemp, Warning, TEXT("=== 게임오버 ==="));
+
+
 }

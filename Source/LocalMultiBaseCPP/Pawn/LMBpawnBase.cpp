@@ -135,6 +135,11 @@ float ALMBpawnBase::TakeDamage(
 void ALMBpawnBase::Die()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s has died"), *GetName());
+	ALMBMyGameModeBase* GM = Cast<ALMBMyGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (GM)
+	{
+		GM->NotifyPlayerDied(this);  // <- 이 호출이 실제로 일어나야 함
+	}
 
 	Destroy();
 }
