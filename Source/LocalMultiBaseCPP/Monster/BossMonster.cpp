@@ -131,7 +131,7 @@ void ABossMonster::PerformAttack()
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
-    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Pawn, Params);
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_GameTraceChannel1, Params);
 
     // 디버그 라인 표시 (히트 여부에 따라 색상)
     DrawDebugLine(
@@ -147,6 +147,8 @@ void ABossMonster::PerformAttack()
 
     if (bHit)
     {
+        UE_LOG(LogTemp, Warning, TEXT("Boss 라인트레이스가 %s 에 맞음!"), *HitResult.GetActor()->GetName());
+
         if (ALMBpawnPlayer* HitPlayer = Cast<ALMBpawnPlayer>(HitResult.GetActor()))
         {
             float Damage = AttackDamage;
@@ -156,7 +158,7 @@ void ABossMonster::PerformAttack()
                 Damage = AttackDamages[Index];
             }
 
-            UE_LOG(LogTemp, Warning, TEXT("Boss hit %s for %f damage!"), *HitPlayer->GetName(), Damage);
+            UE_LOG(LogTemp, Warning, TEXT("Boss가 %s에게 %f 피해를 줌"), *HitPlayer->GetName(), Damage);
             HitPlayer->ApplyDamage(Damage, this);
         }
     }
